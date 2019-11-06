@@ -1,0 +1,34 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      lang="en"
+      py:strip="">
+<py:match path="head" once="true">
+    <head py:attrs="select('@*')">
+        <meta charset="utf-8"/>
+        <title py:with="title = list(select('title/text()'))" py:choose="">
+            <py:when test="title">${title}</py:when>
+            <py:otherwise>Packages from Void</py:otherwise>
+        </title>
+        <link rel="stylesheet" href="${root_url}/static/style.css" type="text/css"/>
+        ${select('*[local-name()!="title"]')}
+    </head>
+</py:match>
+<py:match path="body" once="true">
+    <body py:attrs="select('@*')">
+        <header>
+            <nav>
+                <ul class="horizontal">
+                    <li><a href="${root_url}">Packages</a></li>
+                    <li><a href="https://github.com/void-linux/void-packages">Templates repository</a></li>
+                    <li><a href="https://voidlinux.org">Void Linux homepage</a></li>
+                </ul>
+            </nav>
+            <form method="GET" action="${root_url}/search" class="searchbox">
+                <input type="text" name="term"/>
+                <input type="submit" value="View"/>
+            </form>
+        </header>
+        ${select('*')}
+    </body>
+</py:match>
+</html>

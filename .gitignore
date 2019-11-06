@@ -1,0 +1,4 @@
+data/
+static/source/
+venv/
+*.sqlite3

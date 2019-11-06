@@ -1,0 +1,72 @@
+html, body {
+    background: #ddd;
+    color: #222;
+}
+
+header {
+    text-align: right;
+}
+
+.searchbox {
+    margin: 1ex;
+}
+
+.content {
+    max-width: 90ex;
+    max-width: 90ch;
+    margin: auto;
+}
+
+a {
+    color: #0000E0;
+    text-decoration: inherit;
+}
+
+header {
+    font-size: 1.2em;
+}
+
+.horizontal {
+    display: inline;
+    padding: 0;
+}
+
+.horizontal li {
+    display: inline;
+    margin: auto 1ex;
+}
+
+td {
+   padding: 0.5ex;
+}
+
+tbody tr:nth-child(2n+1) {
+    background: #bfb;
+}
+
+dd {
+    margin-bottom: 1ex;
+}
+
+ul {
+	columns: 40ex 2;
+	columns: 40ch 2;
+}
+
+li {
+    break-inside: avoid;
+}
+
+hr {
+    max-width: 20ex;
+    max-width: 20ch;
+    color: #bfb;
+    border: none;
+    border-top: dotted 0.4em #bfb;
+	margin: 1.3em auto;
+}
+
+li > aside, .masked > aside {
+    font-size: 0.8em;
+    display: inline;
+}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include href="base.html"/>
+<head/>
+<body>
+    <div class="content">
+        <main>
+            <h1>Newest packages</h1>
+            <ol>
+                <li py:for="i in packages">
+                    <a href="/pkgs.void/package/${i}">${i}</a>
+                </li>
+            </ol>
+            <footer>List excludes devel, debug and multilib packages.</footer>
+        </main>
+    </div>
+    <footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="/pkgs.void/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>
+</body>
+</html>

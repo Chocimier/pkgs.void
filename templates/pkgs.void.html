@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include href="base.html"/>
+<head>
+    <title>${pkgname} from Void</title>
+</head>
+<body>
+    <div class="content">
+        <main>
+            <div class="column">
+                 <h2>${pkgname}</h2>
+                 <p>${short_desc}</p>
+                 <table>
+                   <thead>
+                     <tr>
+                       <td/>
+                       <py:for each="libc in versions.by_libc">
+                       <th scope="col" >${libc.libc}</th>
+                       </py:for>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     <tr py:for="iset in versions.by_iset">
+                       <th scope="row">${iset.iset}</th>
+                       <py:for each="version in iset.by_libc">
+                       <td><a py:if="version" href="/pkgs.void/package/${pkgname}/${version.data.iset}-${version.data.libc}"
+                       >${version.version}<sub>_${version.revision}</sub></a></td>
+                       </py:for>
+                     </tr>
+                   </tbody>
+                 </table>
+                 ${nonfreeness}
+                 <p xmlns:py="http://genshi.edgewall.org/" py:if="upstreamver">We know that authors released version<py:for each="version in upstreamver"> ${version}</py:for>. Please give maintainer some time to update.</p>
+                 <dl py:if="fields">
+                 <py:for each="field in fields">
+                     <dt>${field.title}:</dt>
+                     <dd>${field.value}</dd>
+                 </py:for>
+                 </dl>
+                 </div>
+            </main>
+        <aside>
+            <a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${mainpkg.pkgname}/template">Package template</a>
+        </aside>
+    </div>
+</body>
+</html>
