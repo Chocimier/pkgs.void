@@ -17,9 +17,30 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
+from datetime import datetime, timedelta
 
 import datasource
 from repopaths import index_path, load_repo
+
+_OFFSETS = {
+    'CET': timedelta(0, 1*3600),
+    'CEST': timedelta(0, 2*3600),
+    'UTC': timedelta(0, 0),
+    'GMT': timedelta(0, 0),
+    'CDT': timedelta(0, -5*3600),
+    'CST': timedelta(0, -6*3600),
+}
+
+
+def parse_date(string):
+    time_str, zone_code = string.rsplit(' ', 1)
+    try:
+        time = datetime.strptime(time_str, '%Y-%m-%d %H:%M')
+    except ValueError:
+        return string
+    utc_time = time - _OFFSETS[zone_code]
+    result = utc_time.strftime('%Y-%m-%d %H:%M UTC')
+    return result
 
 
 def build_db(source, repos):
@@ -34,7 +55,10 @@ def build_db(source, repos):
             for k, v in repodata[pkgname].items():
                 if isinstance(v, bytes):
                     v = v.decode('utf-8')
-                dictionary[k] = v
+                if k == 'build-date':
+                    dictionary[k] = parse_date(v)
+                else:
+                    dictionary[k] = v
             source.create(datasource.PackageRow(
                 arch=arch,
                 pkgname=pkgname,

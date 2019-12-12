@@ -61,7 +61,6 @@ def _relevant_props():
         {'name': 'changelog', 'formatter': present.as_link},
         {
             'name': 'build-date',
-            'parser': present.parse_date,
             'formatter': present.as_date,
             'combiner': present.combine_minmax
         },

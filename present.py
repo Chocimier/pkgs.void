@@ -15,9 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import Counter, namedtuple
-from datetime import datetime
 
-import pytz
 from genshi.builder import Element
 from genshi.template import TemplateLoader
 from genshi.template.loader import TemplateNotFound
@@ -27,37 +25,6 @@ from humanize import naturalsize
 from custom_types import ValueAt
 from sink import same
 from config import ROOT_URL
-
-
-def _zones_of_code(time, code):
-    for tzname in pytz.all_timezones:
-        zone = pytz.timezone(tzname)
-        try:
-            zone_code = zone.tzname(time)
-        except (pytz.exceptions.AmbiguousTimeError,
-                pytz.exceptions.NonExistentTimeError):
-            continue
-        if zone_code == code:
-            yield zone
-
-
-def parse_date(string):
-    counter = Counter()
-    time_str, zone_code = string.rsplit(' ', 1)
-    try:
-        time = datetime.strptime(time_str, '%Y-%m-%d %H:%M')
-    except ValueError:
-        return string
-    for zone in _zones_of_code(time, zone_code):
-        zone_time = zone.localize(time)
-        utc_time = pytz.timezone('UTC').normalize(zone_time)
-        utc_string = utc_time.strftime('%Y-%m-%d %H:%M UTC')
-        counter[utc_string] += 1
-    try:
-        [[result, _]] = counter.most_common(1)
-    except ValueError:
-        result = string
-    return result
 
 
 def parse_contact(value):
