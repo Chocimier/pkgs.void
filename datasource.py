@@ -77,6 +77,10 @@ class Datasource(metaclass=abc.ABCMeta):
     def newest(self, count):
         '''Finds names of _count_ most recently build packages'''
 
+    @abc.abstractmethod
+    def finish_creating(self):
+        '''Creates indices after data is stored'''
+
 
 class SqliteDataSource(Datasource):
     def __init__(self, path):
@@ -162,6 +166,18 @@ class SqliteDataSource(Datasource):
         self._cursor.execute(query, [int(count)])
         return (x[0] for x in self._cursor.fetchall())
 
+    def finish_creating(self):
+        self._cursor.execute('''create index if not exists pkgname_idx
+            on packages (
+            pkgname
+            )
+            ''')
+        self._cursor.execute('''create index if not exists builddate_idx
+            on packages (
+            builddate desc
+            )
+            ''')
+
 
 def custom_factory(classname, *args, **kwargs):
     return globals()[classname](*args, **kwargs)
@@ -183,3 +199,4 @@ def factory(temporary=False):
 def update(func):
     with factory(temporary=True) as source:
         func(source)
+        source.finish_creating()
