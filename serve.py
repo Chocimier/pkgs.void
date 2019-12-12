@@ -18,7 +18,7 @@
 
 import sys
 
-from bottle import default_app, error, redirect, request, route, run
+from bottle import ServerAdapter, default_app, error, redirect, request, route, run, server_names
 from bottle import static_file
 from genshi.template import TemplateLoader
 
@@ -103,11 +103,21 @@ application = StripSlashMiddleware(
     )
 )
 
-kwargs = {}
 
-try:
-    kwargs['server'] = sys.argv[1]
-except IndexError:
-    pass
+class FlupSocketFCGIServer(ServerAdapter):
+    def run(self, handler):
+        import flup.server.fcgi
+        flup.server.fcgi.WSGIServer(handler).run()
 
-run(app=application, **kwargs)
+
+if __name__ == '__main__':
+    server_names['flup_socket'] = FlupSocketFCGIServer
+
+    kwargs = {}
+
+    try:
+        kwargs['server'] = sys.argv[1]
+    except IndexError:
+        pass
+
+    run(app=application, debug=True, **kwargs)
