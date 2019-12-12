@@ -28,7 +28,6 @@ nonfree/i686
 nonfree/x86_64
 aarch64/aarch64
 aarch64/aarch64-musl
-aarch64/x86_64-repodata
 aarch64/debug/aarch64
 aarch64/debug/aarch64-musl
 aarch64/nonfree/aarch64
