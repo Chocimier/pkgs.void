@@ -27,6 +27,9 @@ from sink import same
 from config import ROOT_URL
 
 
+_LOADER = TemplateLoader('templates')
+
+
 def parse_contact(value):
     return value.split('<')[0].strip()
 
@@ -36,8 +39,7 @@ def render_link(href, text):
 
 
 def render_template(template_path, **kwargs):
-    loader = TemplateLoader('templates')
-    template = loader.load(template_path)
+    template = _LOADER.load(template_path)
     return Markup(template.generate(**kwargs))
 
 
