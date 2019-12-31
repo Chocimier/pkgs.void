@@ -52,13 +52,13 @@ def main(*args):
         script_name, command, arg = args
     except ValueError:
         usage(args[0])
-        exit(1)
+        sys.exit(1)
 
     if command == 'directory_name':
         print(directory_name(arg))
     else:
         usage(script_name)
-        exit(1)
+        sys.exit(1)
 
 
 if __name__ == '__main__':

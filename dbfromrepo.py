@@ -49,12 +49,16 @@ _SINGLE_VALUE_FIELDS = {
 
 def templatedata(pkgname, arch):
     del arch
-    xbps_src = subprocess.run(
-        [DISTDIR + '/xbps-src', 'show', '-p', 'restricted', pkgname],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.DEVNULL
-    )
     result = defaultdict(list)
+    try:
+        xbps_src = subprocess.run(
+            [DISTDIR + '/xbps-src', 'show', '-p', 'restricted', pkgname],
+            check=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.DEVNULL
+        )
+    except subprocess.CalledProcessError:
+        return result
     lines = xbps_src.stdout.decode('utf-8').split('\n')
     for line in lines:
         try:
@@ -67,7 +71,7 @@ def templatedata(pkgname, arch):
 
 def build_db(source, repos):
     srcpkgs = os.path.join(DISTDIR, 'srcpkgs')
-    for no, pkgname in enumerate(os.listdir(srcpkgs)):
+    for pkgname in os.listdir(srcpkgs):
         entry = os.path.join(srcpkgs, pkgname)
         if os.path.islink(entry) or not os.path.isdir(entry):
             continue

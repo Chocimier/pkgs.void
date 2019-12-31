@@ -130,7 +130,7 @@ def web_parameters():
 def nonfreeness(row):
     if row.restricted:
         return 'restricted'
-    elif 'nonfree' in row.repo:
+    if 'nonfree' in row.repo:
         return 'nonfree'
     return 'free'
 

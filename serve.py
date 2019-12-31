@@ -18,8 +18,8 @@
 
 import sys
 
-from bottle import ServerAdapter, default_app, error, redirect, request, route, run, server_names
-from bottle import static_file
+from bottle import ServerAdapter, default_app, error, redirect
+from bottle import request, route, run, server_names, static_file
 from genshi.template import TemplateLoader
 
 from config import ROOT_URL, REPOS
@@ -79,7 +79,7 @@ def error404(err):
     return 'Nothing here, sorry'
 
 
-class UrlPrefixMiddleware(object):
+class UrlPrefixMiddleware():
     def __init__(self, prefix, app):
         self._app = app
         self._prefix = prefix
@@ -92,7 +92,7 @@ class UrlPrefixMiddleware(object):
 
 
 # https://www.bottlepy.org/docs/dev/recipes.html#ignore-trailing-slashes
-class StripSlashMiddleware(object):
+class StripSlashMiddleware():
     def __init__(self, app):
         self._app = app
 
