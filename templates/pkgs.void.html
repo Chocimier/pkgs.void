@@ -25,7 +25,7 @@
                      <tr py:for="iset in versions.by_iset">
                        <th scope="row">${iset.iset}</th>
                        <py:for each="version in iset.by_libc">
-                       <td><a py:if="version" href="/pkgs.void/package/${pkgname}/${version.data.iset}-${version.data.libc}"
+                       <td><a py:if="version" href="${root_url}/package/${pkgname}/${version.data.iset}-${version.data.libc}"
                        >${version.version}<sub>_${version.revision}</sub></a></td>
                        </py:for>
                      </tr>
