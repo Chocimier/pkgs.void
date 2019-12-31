@@ -243,10 +243,8 @@ def page_generator(pkgname, repos, single=False):
             'pkgname': pkgname,
         }
         return present.render_template('nopkg.html', **parameters)
-    template = '{}.void.html'.format(
-        'single_pkg' if single else 'pkgs'
-    )
-    return present.render_template(template, **parameters)
+    template = '{}.void.html'.format('pkgs')
+    return present.render_template(template, single_pkg=single, **parameters)
 
 
 def list_all():

@@ -12,7 +12,14 @@
             <div class="column">
                  <h2>${pkgname}</h2>
                  <p>${short_desc}</p>
-                 <table>
+                 <py:if test="single_pkg">
+                     <hr/>
+                     <p py:with="version=next(next(versions.by_iset).by_libc)">Build for ${version.data.iset}-${version.data.libc}, version
+                     <strong>${version.version}<span class="revision"><span class="revision-separator">_</span>${version.revision}</span></strong>.
+                     <a href="${root_url}/package/${pkgname}">Builds for all architectures</a>.</p>
+                     <hr/>
+                 </py:if>
+                 <table py:if="not single_pkg">
                    <thead>
                      <tr>
                        <td/>
