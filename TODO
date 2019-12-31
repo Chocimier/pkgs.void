@@ -1,7 +1,6 @@
 first:
 note for debug, multilib repositories
 reason of restricted
-synfig: >=1.69.0_1<1.70.0
 
 then:
 better main page (base, popular, featured)

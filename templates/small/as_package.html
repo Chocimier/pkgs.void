@@ -1,1 +1,1 @@
-<span xmlns:py="http://genshi.edgewall.org/" py:strip="True">${version}<sub>_${revision}</sub></span>
+<span xmlns:py="http://genshi.edgewall.org/" py:strip="True" py:for="version, revision in pairs">${version}<sub py:if="revision">${revision}</sub></span>

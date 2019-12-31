@@ -60,8 +60,26 @@ def as_package(value):
         pkgver = ''
     href = ROOT_URL + '/package/' + pkgname
     if '_' in pkgver:
-        version, revision = pkgver.split('_', 1)
-        pkgver = render_template('small/as_package.html', **locals())
+        pairs = []
+        version = ''
+        revision = ''
+        while pkgver:
+            if revision:
+                if pkgver[0].isdigit():
+                    revision += pkgver[0]
+                else:
+                    pairs.append((version, revision))
+                    version = pkgver[0]
+                    revision = ''
+            else:
+                if pkgver[0] == '_':
+                    revision = pkgver[0]
+                else:
+                    version += pkgver[0]
+            pkgver = pkgver[1:]
+        if version:
+            pairs.append((version, revision))
+        pkgver = render_template('small/as_package.html', pairs=pairs)
     return render_link(href, pkgname) + pkgver
 
 
