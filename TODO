@@ -1,6 +1,5 @@
 first:
 note for debug, multilib repositories
-list of all packages
 reason of restricted
 fcgi
 synfig: >=1.69.0_1<1.70.0

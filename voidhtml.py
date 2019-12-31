@@ -248,6 +248,22 @@ def page_generator(pkgname, repos, single=False):
     return present.render_template(template, **parameters)
 
 
+def list_all():
+    source = datasource.factory()
+    packages = source.list_all()
+    parameters = {
+        'packages': ({
+            'pkgname': i.pkgname,
+            'short_desc': (
+                datasource.from_json(i.repodata).get('short_desc') or
+                datasource.from_json(i.templatedata).get('short_desc')
+                )
+            } for i in packages),
+    }
+    parameters.update(web_parameters())
+    return present.render_template('all.html', **parameters)
+
+
 def newest():
     source = datasource.factory()
     packages = source.newest(50)

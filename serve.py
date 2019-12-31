@@ -37,6 +37,11 @@ def search():
     redirect(ROOT_URL + '/package/' + request.query.get('term'))
 
 
+@route('/all')
+def list_all_():
+    return static_file('all.html', 'static/generated')
+
+
 @route('/newest')
 def newest_():
     return newest()

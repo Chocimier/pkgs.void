@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:py="http://genshi.edgewall.org/"
+      xmlns:xi="http://www.w3.org/2001/XInclude">
+<xi:include href="base.html"/>
+<head/>
+<body>
+    <div class="content">
+        <main>
+            <h1>All packages</h1>
+            <dl>
+                <py:for each="i in packages">
+                <dt><a href="${root_url}/package/${i.pkgname}">${i.pkgname}</a></dt>
+                <dd>${i.short_desc}</dd>
+                </py:for>
+            </dl>
+        </main>
+    </div>
+</body>
+</html>

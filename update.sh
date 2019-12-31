@@ -25,6 +25,7 @@ updates=
 
 cd "$(dirname "$0")" || exit 1
 [ -r ./profile ] && . ./profile
+. venv/bin/activate
 
 while true
 do
@@ -83,3 +84,6 @@ rm -f newindex.sqlite3
 [ "$updates" ] && ./updates.py $repos
 
 mv newindex.sqlite3 index.sqlite3
+
+mkdir -p static/generated
+python -c 'import voidhtml; print(voidhtml.list_all())' > static/generated/all.html

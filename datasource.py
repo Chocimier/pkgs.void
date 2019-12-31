@@ -64,6 +64,10 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Finds packages that match criteria passed as keyword arguments.'''
 
     @abc.abstractmethod
+    def list_all(self):
+        '''Returns list of all packages.'''
+
+    @abc.abstractmethod
     def update(self, **kwargs):
         '''Finds packages matching criteria passed as keyword arguments
         and sets values passed as keyword arguments prefixed with 'set_'.'''
@@ -126,6 +130,14 @@ class SqliteDataSource(Datasource):
         )
         self._cursor.execute(query, [kwargs[i] for i in fixed])
         return (PackageRow(*x) for x in self._cursor.fetchall())
+
+    def list_all(self):
+        '''Returns list of all packages.'''
+        query = 'SELECT {} FROM packages group by pkgname'.format(
+            ', '.join(PackageRow._fields),
+        )
+        self._cursor.execute(query)
+        return [PackageRow(*x) for x in self._cursor.fetchall()]
 
     @staticmethod
     def _sets(argname):
