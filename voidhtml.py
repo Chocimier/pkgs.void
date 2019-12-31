@@ -19,7 +19,7 @@ from collections import Counter, OrderedDict, defaultdict
 
 import datasource
 import present
-from custom_types import Binpkgs, Field, ValueAt
+from custom_types import Binpkgs, Field, Repo, ValueAt
 from sink import same
 
 
@@ -61,7 +61,7 @@ def _relevant_props():
         {'name': 'repository', 'combiner': present.combine_with_template({
             'directory': 'repository',
             'to_template': (lambda value:
-                            value if value == 'restricted' else 'additional')
+                            'restricted' if value.repo == 'restricted' else 'additional')
         })},
         {
             'name': 'build-date',
@@ -148,7 +148,7 @@ def make_pkg(row):
     pkg['libc'] = libc
     repo = separate_repository(row)
     if repo:
-        pkg['repository'] = repo
+        pkg['repository'] = Repo(repo, row.restricted)
     pkg['mainpkgname'] = pkg.get('source-revisions', row.pkgname).split(':')[0]
     pkg['upstreamver'] = row.upstreamver
     return pkg

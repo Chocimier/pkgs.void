@@ -52,7 +52,7 @@ def templatedata(pkgname, arch):
     result = defaultdict(list)
     try:
         xbps_src = subprocess.run(
-            [DISTDIR + '/xbps-src', 'show', '-p', 'restricted', pkgname],
+            [DISTDIR + '/xbps-src', 'show', '-p', 'restricted*', pkgname],
             check=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.DEVNULL
@@ -92,11 +92,13 @@ def build_db(source, repos):
         dictionary['source-revisions'] = dictionary['pkgname']
         template_json = datasource.to_json(dictionary)
         if 'restricted' in dictionary:
+            if dictionary['restricted'] == 'yes':
+                dictionary['restricted'] = True
             source.create(datasource.PackageRow(
                 pkgname=pkgname,
                 pkgver=pkgver,
                 arch='unknown-unknown',
-                restricted=True,
+                restricted=dictionary['restricted'],
                 builddate='',
                 repodata='{}',
                 templatedata=template_json,
