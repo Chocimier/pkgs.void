@@ -66,6 +66,9 @@ class Binpkgs:
 Field = namedtuple('Field', ('name', 'title', 'value'))
 
 
+FoundPackages = namedtuple('FoundPackages', ('parameters', 'other'))
+
+
 class Repo:
     def __init__(self, repo, reason=None):
         self.repo = repo

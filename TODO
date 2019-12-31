@@ -1,5 +1,4 @@
 first:
-improve /package/glibc/aarch64-musl # if row.arch not in repos:
 
 then:
 better main page (base, popular, featured)

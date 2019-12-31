@@ -7,8 +7,13 @@
 <body>
     <div class="content">
         <main>
-            <p>There is no "${pkgname}" package <i>yet</i>.</p>
-            <p>You can search for packages by in-browser search on page listing <a href="${root_url}/all">all templates</a>.</p>
+            <p>There is no "${pkgname}" package
+            <py:if test="other_archs">for this arch</py:if>
+            <i>yet</i>.</p>
+            <p py:choose="other_archs">
+                <py:when test="True">See <a href="${root_url}/package/${pkgname}">archs where ${pkgname} is available</a>.</py:when>
+                <py:otherwise><p>You can search for packages in-browser on page listing <a href="${root_url}/all">all templates</a>.</p></py:otherwise>
+            </p>
         </main>
     </div>
 </body>

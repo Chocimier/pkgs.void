@@ -19,7 +19,7 @@ from collections import Counter, OrderedDict, defaultdict
 
 import datasource
 import present
-from custom_types import Binpkgs, Field, Repo, ValueAt
+from custom_types import Binpkgs, Field, FoundPackages, Repo, ValueAt
 from sink import same
 
 
@@ -215,32 +215,36 @@ def data_generator(pkgname, repos):
     binpkgs = Binpkgs()
     source = datasource.factory()
     fields_dic = defaultdict(list)
+    other_archs = False
     for row in source.read(pkgname=pkgname):
         if row.arch not in repos:
+            other_archs = True
             continue
         pkg = make_pkg(row)
         binpkgs.add(pkg['verrev'], iset=pkg['iset'], libc=pkg['libc'])
         fields_dic_append(fields_dic, pkg)
     if not binpkgs:
-        return None
+        return FoundPackages(None, other_archs)
     fields = combine_fields(fields_dic, binpkgs, pkgname)
     separated = separate_fields(fields, SEPARATED_FIELDS)
     upstreamver = new_versions(binpkgs, separated['upstreamver'])
-    return {
+    return FoundPackages({
         'pkgname': pkgname,
         'short_desc': separated['short_desc'],
         'fields': fields,
         'versions': binpkgs,
         'mainpkg': {'pkgname': separated['mainpkgname']},
         'upstreamver': upstreamver,
-    }
+    }, other_archs)
 
 
 def page_generator(pkgname, repos, single=False):
-    parameters = data_generator(pkgname, repos)
+    found = data_generator(pkgname, repos)
+    parameters = found.parameters
     if not parameters:
         parameters = {
             'pkgname': pkgname,
+            'other_archs': found.other,
         }
         return present.render_template('nopkg.html', **parameters)
     template = '{}.void.html'.format('pkgs')
