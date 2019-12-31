@@ -50,11 +50,11 @@ if [ "$templates" ]
 then
     : "${XBPS_DISTDIR:=$(xdistdir)}"
     ( cd "$XBPS_DISTDIR" || exit $?
-    git checkout xbps-src-p || exit $?
+    git checkout -q xbps-src-p || exit $?
     if [ "$download" ]
     then
-        git fetch origin || exit $?
-        git rebase origin/master || exit $?
+        git fetch -q origin || exit $?
+        git rebase -q origin/master || exit $?
     fi
     ) || exit $?
 fi
