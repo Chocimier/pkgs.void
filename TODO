@@ -1,9 +1,12 @@
 first:
+single dir tar archive
+unify pkgs and single templates
+searching note
+improve /package/glibc/aarch64-musl # if row.arch not in repos:
 
 then:
 better main page (base, popular, featured)
 links to subpkgs
-improve /package/glibc/aarch64-musl # if row.arch not in repos:
 show site update date
 restricted for archs
 
