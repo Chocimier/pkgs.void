@@ -1,7 +1,7 @@
 venv
 data
-static/generated
-static/source
+pkgs.void/static/generated
+pkgs.void/static/source
 .git
 __pycache__
 *.sqlite3

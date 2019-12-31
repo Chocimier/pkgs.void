@@ -43,7 +43,9 @@ do
 done
 
 mkdir -p static/source
-tar cjf static/source/tmp.tar.bz2  --exclude-ignore tar-exclude . || exit 1
+cd .. || exit 1
+tar cjf pkgs.void/static/source/tmp.tar.bz2 --exclude-ignore tar-exclude pkgs.void || exit 1
+cd pkgs.void || exit 1
 mv static/source/tmp.tar.bz2  static/source/pkgs.void.tar.bz2 || exit 1
 
 if [ "$templates" ]

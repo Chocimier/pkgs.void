@@ -1,5 +1,4 @@
 first:
-single dir tar archive
 unify pkgs and single templates
 searching note
 improve /package/glibc/aarch64-musl # if row.arch not in repos:
