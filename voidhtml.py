@@ -17,7 +17,6 @@
 import sys
 from collections import Counter, OrderedDict, defaultdict
 
-import config
 import datasource
 import present
 from custom_types import Binpkgs, Field, ValueAt
@@ -59,6 +58,11 @@ def _relevant_props():
         {'name': 'license'},
         {'name': 'maintainer', 'parser': present.parse_contact},
         {'name': 'changelog', 'formatter': present.as_link},
+        {'name': 'repository', 'combiner': present.combine_with_template({
+            'directory': 'repository',
+            'to_template': (lambda value:
+                            value if value == 'restricted' else 'additional')
+        })},
         {
             'name': 'build-date',
             'formatter': present.as_date,
@@ -82,7 +86,6 @@ def _relevant_props():
             'islist': True
         },
         {'name': 'reverts', 'islist': True},
-        {'name': 'nonfreeness', 'combiner': present.combine_with_templates},
         {'name': 'mainpkgname', 'combiner': present.combine_simple},
         {'name': 'upstreamver', 'combiner': present.combine_set},
         {'name': 'shlib-provides', 'islist': True},
@@ -121,18 +124,18 @@ def display_field_name(field):
         return display
 
 
-def web_parameters():
-    return {
-        'root_url': config.ROOT_URL,
-    }
-
-
-def nonfreeness(row):
+def separate_repository(row):
     if row.restricted:
         return 'restricted'
+    if 'multilib/nonfree' in row.repo:
+        return 'multilib-nonfree'
     if 'nonfree' in row.repo:
         return 'nonfree'
-    return 'free'
+    if 'multilib' in row.repo:
+        return 'multilib'
+    if 'debug' in row.repo:
+        return 'debug'
+    return None
 
 
 def make_pkg(row):
@@ -143,7 +146,9 @@ def make_pkg(row):
     iset, libc = split_arch(row.arch)
     pkg['iset'] = iset
     pkg['libc'] = libc
-    pkg['nonfreeness'] = nonfreeness(row)
+    repo = separate_repository(row)
+    if repo:
+        pkg['repository'] = repo
     pkg['mainpkgname'] = pkg.get('source-revisions', row.pkgname).split(':')[0]
     pkg['upstreamver'] = row.upstreamver
     return pkg
@@ -189,7 +194,6 @@ def fields_dic_append(fields_dic, pkg):
 
 SEPARATED_FIELDS = [
     'short_desc',
-    'nonfreeness',
     'mainpkgname',
     'upstreamver'
 ]
@@ -227,7 +231,6 @@ def data_generator(pkgname, repos):
         'short_desc': separated['short_desc'],
         'fields': fields,
         'versions': binpkgs,
-        'nonfreeness': separated['nonfreeness'],
         'mainpkg': {'pkgname': separated['mainpkgname']},
         'upstreamver': upstreamver,
     }
@@ -239,12 +242,10 @@ def page_generator(pkgname, repos, single=False):
         parameters = {
             'pkgname': pkgname,
         }
-        parameters.update(web_parameters())
         return present.render_template('nopkg.html', **parameters)
     template = '{}.void.html'.format(
         'single_pkg' if single else 'pkgs'
     )
-    parameters.update(web_parameters())
     return present.render_template(template, **parameters)
 
 
@@ -260,7 +261,6 @@ def list_all():
                 )
             } for i in packages),
     }
-    parameters.update(web_parameters())
     return present.render_template('all.html', **parameters)
 
 
@@ -270,7 +270,6 @@ def newest():
     parameters = {
         'packages': packages,
     }
-    parameters.update(web_parameters())
     return present.render_template('newest.html', **parameters)
 
 

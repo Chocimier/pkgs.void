@@ -14,6 +14,14 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import config
+
 
 def same(arg):
     return arg
+
+
+def web_parameters():
+    return {
+        'root_url': config.ROOT_URL,
+    }

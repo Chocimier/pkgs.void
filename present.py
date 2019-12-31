@@ -23,7 +23,7 @@ from genshi.template.markup import Markup
 from humanize import naturalsize
 
 from custom_types import ValueAt
-from sink import same
+from sink import same, web_parameters
 from config import ROOT_URL
 
 
@@ -40,7 +40,7 @@ def render_link(href, text):
 
 def render_template(template_path, **kwargs):
     template = _LOADER.load(template_path)
-    return Markup(template.generate(**kwargs))
+    return Markup(template.generate(**web_parameters(), **kwargs))
 
 
 def as_new_version(versions):
@@ -143,24 +143,33 @@ CombineWithTemplatesConfig = namedtuple(
 )
 
 
+COMBINE_TEMPLATE_DEFAULTS = {
+    'single_plain': True,
+    'directory': 'generic',
+    'top_template': 'list',
+    'to_template': lambda x: 'entry',
+}
+
+
 def combine_simple(prop, values, space, pkgname):
-    config = CombineWithTemplatesConfig(
-        single_plain=True,
-        directory='generic',
-        top_template='list',
-        to_template=lambda x: 'entry',
-    )
+    config = CombineWithTemplatesConfig(**COMBINE_TEMPLATE_DEFAULTS)
     return combine_with_templates(prop, values, space, pkgname, config=config)
 
 
-def combine_with_template(prop, values, space, pkgname, config=None):
-    conf = config or CombineWithTemplatesConfig(
-        single_plain=False,
-        directory=prop.name,
-        top_template='top',
-        to_template=lambda x: 'entry',
+def combine_with_template(config=None):
+    config = config or {}
+    conf = CombineWithTemplatesConfig(
+        **{
+            **COMBINE_TEMPLATE_DEFAULTS,
+            **{
+                'single_plain': False,
+                'top_template': 'top',
+            },
+            **config
+        }
     )
-    return combine_with_templates(prop, values, space, pkgname, conf)
+    return (lambda prop, values, space, pkgname:
+            combine_with_templates(prop, values, space, pkgname, conf))
 
 
 def group_variants(prop, values, space, config):
