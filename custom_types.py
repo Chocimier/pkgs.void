@@ -69,22 +69,7 @@ Field = namedtuple('Field', ('name', 'title', 'value'))
 FoundPackages = namedtuple('FoundPackages', ('parameters', 'other'))
 
 
-class Repo:
-    def __init__(self, repo, reason=None):
-        self.repo = repo
-        self.reason = reason
-
-    def _tuple(self):
-        return (self.repo, self.reason)
-
-    def __lt__(self, other):
-        return self._tuple() < other._tuple()
-
-    def __eq__(self, other):
-        return self._tuple() == other._tuple()
-
-    def __hash__(self):
-        return hash(self._tuple())
+Repo = namedtuple('Repo', ('repo', 'reason'))
 
 
 ValueAt = namedtuple('ValueAt', ('value', 'coords'))
