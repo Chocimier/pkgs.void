@@ -29,7 +29,6 @@ PackageRow = namedtuple(
         'pkgver',
         'arch',
         'restricted',
-        'builddate',
         'repodata',
         'templatedata',
         'upstreamver',
@@ -98,7 +97,6 @@ class SqliteDataSource(Datasource):
             pkgname text not null,
             pkgver text not null,
             restricted integer not null,
-            builddate text not null,
             repodata text not null,
             templatedata text not null,
             upstreamver text not null,
@@ -182,11 +180,6 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create index if not exists pkgname_idx
             on packages (
             pkgname
-            )
-            ''')
-        self._cursor.execute('''create index if not exists builddate_idx
-            on packages (
-            builddate desc
             )
             ''')
 

@@ -64,7 +64,6 @@ def build_db(source, repos):
                 pkgname=pkgname,
                 pkgver=dictionary['pkgver'],
                 restricted=False,
-                builddate=dictionary['build-date'],
                 repodata=datasource.to_json(dictionary),
                 templatedata=datasource.to_json({}),
                 upstreamver='',

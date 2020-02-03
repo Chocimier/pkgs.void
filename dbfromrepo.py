@@ -99,7 +99,6 @@ def build_db(source, repos):
                 pkgver=pkgver,
                 arch='unknown-unknown',
                 restricted=dictionary['restricted'],
-                builddate='',
                 repodata='{}',
                 templatedata=template_json,
                 upstreamver='',
