@@ -266,13 +266,13 @@ def list_all():
     return present.render_template('all.html', **parameters)
 
 
-def newest():
+def longest_names():
     source = datasource.factory()
-    packages = source.newest(50)
+    packages = source.longest_names(100)
     parameters = {
         'packages': packages,
     }
-    return present.render_template('newest.html', **parameters)
+    return present.render_template('longest_names.html', **parameters)
 
 
 def main():

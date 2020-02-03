@@ -77,8 +77,9 @@ class Datasource(metaclass=abc.ABCMeta):
         passed as keyword arguments'''
 
     @abc.abstractmethod
-    def newest(self, count):
-        '''Finds names of _count_ most recently build packages'''
+    def longest_names(self, at_most):
+        '''Finds names of packages having name longer than '''
+        '''at_most-th longest-name-bearing package'''
 
     @abc.abstractmethod
     def finish_creating(self):
@@ -164,16 +165,28 @@ class SqliteDataSource(Datasource):
         passed as keyword arguments'''
         ...
 
-    def newest(self, count):
-        '''Finds names of _count_ most recently build packages'''
+    def longest_names(self, at_most):
+        '''Finds names of packages having name longer than '''
+        '''at_most-th longest-name-bearing package'''
         query = (
             'select distinct pkgname from packages '
             'where repo not like "multilib%" '
             'and pkgname not like "%-devel" '
             'and pkgname not like "%-dbg" '
-            'order by builddate desc limit ?'
+            'and length(pkgname) > ('
+            '  select length(pkgname) from ('
+            '    select distinct pkgname '
+            '    from packages '
+            '    where repo not like "multilib%" '
+            '    and pkgname not like "%-devel" '
+            '    and pkgname not like "%-dbg" '
+            '  )'
+            '  order by length(pkgname) desc'
+            '  limit 1 offset ?'
+            ')'
+            'order by pkgname'
         )
-        self._cursor.execute(query, [int(count)])
+        self._cursor.execute(query, [int(at_most)])
         return (x[0] for x in self._cursor.fetchall())
 
     def finish_creating(self):
