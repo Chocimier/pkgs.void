@@ -21,6 +21,7 @@ from datetime import datetime, timedelta
 
 import datasource
 from repopaths import index_path, load_repo
+from sink import string_hash
 
 _OFFSETS = {
     'CET': timedelta(0, 1*3600),
@@ -62,6 +63,7 @@ def build_db(source, repos):
             source.create(datasource.PackageRow(
                 arch=arch,
                 pkgname=pkgname,
+                pkgname_hash=string_hash(pkgname),
                 pkgver=dictionary['pkgver'],
                 restricted=False,
                 repodata=datasource.to_json(dictionary),

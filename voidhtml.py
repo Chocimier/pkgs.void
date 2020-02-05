@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+import datetime
 import sys
 from collections import Counter, OrderedDict, defaultdict
 
@@ -266,13 +267,24 @@ def list_all():
     return present.render_template('all.html', **parameters)
 
 
+def of_day():
+    source = datasource.factory()
+    packages = source.of_day(datetime.datetime.now().date())
+    parameters = {
+        'title': 'Packages of the day',
+        'packages': packages,
+    }
+    return present.render_template('list.html', **parameters)
+
+
 def longest_names():
     source = datasource.factory()
     packages = source.longest_names(100)
     parameters = {
+        'title': 'Packages with longest names',
         'packages': packages,
     }
-    return present.render_template('longest_names.html', **parameters)
+    return present.render_template('list.html', **parameters)
 
 
 def main():

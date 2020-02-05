@@ -20,12 +20,14 @@ import sqlite3
 from collections import namedtuple
 
 import config
+from sink import string_hash
 
 
 PackageRow = namedtuple(
     'PackageRow',
     (
         'pkgname',
+        'pkgname_hash',
         'pkgver',
         'arch',
         'restricted',
@@ -77,6 +79,10 @@ class Datasource(metaclass=abc.ABCMeta):
         passed as keyword arguments'''
 
     @abc.abstractmethod
+    def of_day(self, date):
+        '''Returns different packages every day'''
+
+    @abc.abstractmethod
     def longest_names(self, at_most):
         '''Finds names of packages having name longer than '''
         '''at_most-th longest-name-bearing package'''
@@ -96,6 +102,7 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create table if not exists packages (
             arch text not null,
             pkgname text not null,
+            pkgname_hash text not null,
             pkgver text not null,
             restricted integer not null,
             repodata text not null,
@@ -165,6 +172,19 @@ class SqliteDataSource(Datasource):
         passed as keyword arguments'''
         ...
 
+    def of_day(self, date):
+        '''Returns different packages every day'''
+        query = (
+            'select distinct pkgname from packages '
+            'where repo not like "multilib%" '
+            'and pkgname not like "%-devel" '
+            'and pkgname not like "%-dbg" '
+            'and pkgname_hash like ? || "%"'
+            'order by pkgname'
+        )
+        self._cursor.execute(query, [string_hash(date)[:2]])
+        return (x[0] for x in self._cursor.fetchall())
+
     def longest_names(self, at_most):
         '''Finds names of packages having name longer than '''
         '''at_most-th longest-name-bearing package'''
@@ -193,6 +213,11 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create index if not exists pkgname_idx
             on packages (
             pkgname
+            )
+            ''')
+        self._cursor.execute('''create index if not exists pkgname_hash_idx
+            on packages (
+            pkgname_hash
             )
             ''')
 

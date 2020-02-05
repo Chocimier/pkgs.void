@@ -20,6 +20,7 @@ import os
 import subprocess
 import sys
 from collections import defaultdict
+from sink import string_hash
 
 import datasource
 
@@ -96,6 +97,7 @@ def build_db(source, repos):
                 dictionary['restricted'] = True
             source.create(datasource.PackageRow(
                 pkgname=pkgname,
+                pkgname_hash=string_hash(pkgname),
                 pkgver=pkgver,
                 arch='unknown-unknown',
                 restricted=dictionary['restricted'],

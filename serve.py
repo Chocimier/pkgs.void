@@ -23,14 +23,14 @@ from bottle import request, route, run, server_names, static_file
 from genshi.template import TemplateLoader
 
 from config import ROOT_URL, REPOS
-from voidhtml import join_arch, longest_names, page_generator
+from voidhtml import join_arch, longest_names, of_day, page_generator
 
 
 @route('')
 @route('/')
 @route('/newest')
 def index():
-    redirect(ROOT_URL + '/longest_names')
+    redirect(ROOT_URL + '/of_day')
 
 
 @route('/search')
@@ -41,6 +41,11 @@ def search():
 @route('/all')
 def list_all_():
     return static_file('all.html', 'static/generated')
+
+
+@route('/of_day')
+def of_day_():
+    return of_day()
 
 
 @route('/longest_names')
