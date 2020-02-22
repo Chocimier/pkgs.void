@@ -278,6 +278,16 @@ def of_day():
     return present.render_template('list.html', **parameters)
 
 
+def newest():
+    source = datasource.factory()
+    packages = source.newest(50)
+    parameters = {
+        'title': 'Newest packages',
+        'packages': packages,
+    }
+    return present.render_template('list.html', **parameters)
+
+
 def longest_names():
     source = datasource.factory()
     packages = source.longest_names(100)

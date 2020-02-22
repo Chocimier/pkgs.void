@@ -84,6 +84,10 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Returns different packages every day'''
 
     @abc.abstractmethod
+    def newest(self, count):
+        '''Finds names of _count_ most recently build packages'''
+
+    @abc.abstractmethod
     def longest_names(self, at_most):
         '''Finds names of packages having name longer than '''
         '''at_most-th longest-name-bearing package'''
@@ -185,6 +189,20 @@ class SqliteDataSource(Datasource):
             'order by pkgname'
         )
         self._cursor.execute(query, [string_hash(date)[:2]])
+        return (x[0] for x in self._cursor.fetchall())
+
+    def newest(self, count):
+        '''Finds names of _count_ most recently build packages'''
+        query = (
+            'select distinct pkgname from packages '
+            'where repo not like "multilib%" '
+            'and pkgname not like "%-devel" '
+            'and pkgname not like "%-dbg" '
+            "and builddate != '' "
+            'order by builddate desc '
+            'limit ?'
+        )
+        self._cursor.execute(query, [int(count)])
         return (x[0] for x in self._cursor.fetchall())
 
     def longest_names(self, at_most):

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -23,14 +23,13 @@ from bottle import request, route, run, server_names, static_file
 from genshi.template import TemplateLoader
 
 from config import ROOT_URL, REPOS
-from voidhtml import join_arch, longest_names, of_day, page_generator
+from voidhtml import join_arch, longest_names, newest, of_day, page_generator
 
 
 @route('')
 @route('/')
-@route('/newest')
 def index():
-    redirect(ROOT_URL + '/of_day')
+    redirect(ROOT_URL + '/newest')
 
 
 @route('/search')
@@ -46,6 +45,11 @@ def list_all_():
 @route('/of_day')
 def of_day_():
     return of_day()
+
+
+@route('/newest')
+def newest_():
+    return newest()
 
 
 @route('/longest_names')
