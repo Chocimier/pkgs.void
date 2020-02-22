@@ -17,6 +17,7 @@
 from collections import Counter, namedtuple
 
 from genshi.builder import Element
+from genshi.output import XMLSerializer
 from genshi.template import TemplateLoader
 from genshi.template.loader import TemplateNotFound
 from genshi.template.markup import Markup
@@ -30,6 +31,10 @@ from config import ROOT_URL
 _LOADER = TemplateLoader('templates')
 
 
+def _serializer(**kwargs):
+    return XMLSerializer(strip_whitespace=False, **kwargs)
+
+
 def parse_contact(value):
     return value.split('<')[0].strip()
 
@@ -40,6 +45,7 @@ def render_link(href, text):
 
 def render_template(template_path, **kwargs):
     template = _LOADER.load(template_path)
+    template.serializer = _serializer
     return Markup(template.generate(**web_parameters(), **kwargs))
 
 
