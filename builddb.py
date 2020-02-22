@@ -34,7 +34,7 @@ def build_db(source, repos):
             dictionary = {}
             for k, v in repodata[pkgname].items():
                 if isinstance(v, bytes):
-                    v = v.decode('utf-8')
+                    v = v.decode()
                 dictionary[k] = v
             source.create(datasource.PackageRow(
                 arch=arch,
