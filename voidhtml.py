@@ -25,12 +25,15 @@ from sink import same
 
 
 class RelevantProperty:
-    def __init__(self, name, islist=False, formatter=None, combiner=None, parser=None):
-        from present import combine_simple
+    def __init__(
+            self, name,
+            islist=False, formatter=None, combiner=None, parser=None
+    ):
+        # pylint: disable=too-many-arguments
         self.name = name
         self.islist = islist
         self.formatter = formatter or same
-        self.combiner = combiner or combine_simple
+        self.combiner = combiner or present.combine_simple
         self.parser = parser or same
 
 
@@ -53,6 +56,10 @@ def join_arch(iset, libc):
 
 
 def _relevant_props():
+    def to_template(value):
+        if value.repo == 'restricted':
+            return 'restricted'
+        return 'additional'
     data = (
         {'name': 'short_desc'},
         {'name': 'homepage', 'formatter': present.as_link},
@@ -61,8 +68,7 @@ def _relevant_props():
         {'name': 'changelog', 'formatter': present.as_link},
         {'name': 'repository', 'combiner': present.combine_with_template({
             'directory': 'repository',
-            'to_template': (lambda value:
-                            'restricted' if value.repo == 'restricted' else 'additional')
+            'to_template': to_template,
         })},
         {
             'name': 'build-date',

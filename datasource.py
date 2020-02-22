@@ -116,8 +116,8 @@ class Datasource(metaclass=abc.ABCMeta):
 
     @abc.abstractmethod
     def longest_names(self, at_most):
-        '''Finds names of packages having name longer than '''
-        '''at_most-th longest-name-bearing package'''
+        '''Finds names of packages having name longer than
+        at_most-th longest-name-bearing package'''
 
     @abc.abstractmethod
     def finish_creating(self):
@@ -261,8 +261,8 @@ class SqliteDataSource(Datasource):
         return (x[0] for x in self._cursor.fetchall())
 
     def longest_names(self, at_most):
-        '''Finds names of packages having name longer than '''
-        '''at_most-th longest-name-bearing package'''
+        '''Finds names of packages having name longer than
+        at_most-th longest-name-bearing package'''
         query = (
             'select distinct pkgname from packages '
             'where repo not like "multilib%" '

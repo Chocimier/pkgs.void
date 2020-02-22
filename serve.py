@@ -36,7 +36,8 @@ def index():
 
 @route('/search')
 def search():
-    redirect(ROOT_URL + '/package/' + request.query.get('term'))
+    term = request.query.get('term')  # pylint: disable=no-member
+    redirect(ROOT_URL + '/package/' + term)
 
 
 @route('/all')
@@ -118,7 +119,7 @@ class StripSlashMiddleware():
         return self._app(env, handler)
 
 
-application = StripSlashMiddleware(
+application = StripSlashMiddleware(  # pylint: disable=invalid-name
     UrlPrefixMiddleware(
         ROOT_URL,
         default_app()
@@ -128,18 +129,23 @@ application = StripSlashMiddleware(
 
 class FlupSocketFCGIServer(ServerAdapter):
     def run(self, handler):
+        # pylint: disable=import-outside-toplevel
         import flup.server.fcgi
         flup.server.fcgi.WSGIServer(handler).run()
 
 
-if __name__ == '__main__':
+def serve(args):
     server_names['flup_socket'] = FlupSocketFCGIServer
 
     kwargs = {}
 
     try:
-        kwargs['server'] = sys.argv[1]
+        kwargs['server'] = args[0]
     except IndexError:
         pass
 
     run(app=application, debug=True, **kwargs)
+
+
+if __name__ == '__main__':
+    serve(sys.argv[1:])
