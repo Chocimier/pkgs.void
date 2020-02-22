@@ -34,6 +34,7 @@ PackageRow = namedtuple(
         'builddate',
         'repodata',
         'templatedata',
+        'depends_count',
         'upstreamver',
         'repo',
     )
@@ -113,6 +114,7 @@ class SqliteDataSource(Datasource):
             builddate text not null,
             repodata text not null,
             templatedata text not null,
+            depends_count integer,
             upstreamver text not null,
             repo text not null)
             ''')
@@ -191,6 +193,17 @@ class SqliteDataSource(Datasource):
         self._cursor.execute(query, [string_hash(date)[:2]])
         return (x[0] for x in self._cursor.fetchall())
 
+    def metapackages(self):
+        '''Finds names of _count_ most recently build packages'''
+        query = (
+            'select distinct pkgname from packages '
+            'where depends_count > 1 '
+            "and not pkgname like '%-32bit' "
+            'and repodata like \'%"installed_size": 0%\' '
+        )
+        self._cursor.execute(query, [])
+        return (x[0] for x in self._cursor.fetchall())
+
     def newest(self, count):
         '''Finds names of _count_ most recently build packages'''
         query = (
@@ -243,6 +256,11 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create index if not exists builddate_idx
             on packages (
             builddate desc
+            )
+            ''')
+        self._cursor.execute('''create index if not exists depends_count_idx
+            on packages (
+            depends_count
             )
             ''')
         self._cursor.execute('''create index if not exists pkgname_hash_idx

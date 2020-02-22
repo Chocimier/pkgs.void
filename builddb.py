@@ -36,6 +36,7 @@ def build_db(source, repos):
                 if isinstance(v, bytes):
                     v = v.decode()
                 dictionary[k] = v
+            depends_count = len(dictionary.get('run_depends', []))
             source.create(datasource.PackageRow(
                 arch=arch,
                 pkgname=pkgname,
@@ -45,6 +46,7 @@ def build_db(source, repos):
                 builddate='',
                 repodata=datasource.to_json(dictionary),
                 templatedata=datasource.to_json({}),
+                depends_count=depends_count,
                 upstreamver='',
                 repo=repo
             ))

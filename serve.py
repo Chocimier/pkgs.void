@@ -23,7 +23,9 @@ from bottle import request, route, run, server_names, static_file
 from genshi.template import TemplateLoader
 
 from config import ROOT_URL, REPOS
-from voidhtml import join_arch, longest_names, newest, of_day, page_generator
+from voidhtml import (
+    join_arch, longest_names, metapackages, newest, of_day, page_generator
+)
 
 
 @route('')
@@ -50,6 +52,11 @@ def of_day_():
 @route('/newest')
 def newest_():
     return newest()
+
+
+@route('/sets')
+def metapackages_():
+    return metapackages()
 
 
 @route('/longest_names')

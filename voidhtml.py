@@ -284,6 +284,16 @@ def of_day():
     return present.render_template('list.html', **parameters)
 
 
+def metapackages():
+    source = datasource.factory()
+    packages = source.metapackages()
+    parameters = {
+        'title': 'Package sets',
+        'packages': packages,
+    }
+    return present.render_template('list.html', **parameters)
+
+
 def newest():
     source = datasource.factory()
     packages = source.newest(50)

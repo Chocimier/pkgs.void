@@ -103,6 +103,7 @@ def build_db(source, repos):
                 builddate='',
                 repodata='{}',
                 templatedata=template_json,
+                depends_count=0,
                 upstreamver='',
                 repo=''
             ))
