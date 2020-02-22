@@ -88,7 +88,6 @@ def build_db(source, repos):
             pkgver = '{pkgname}-{version}_{revision}'.format(**dictionary)
         except KeyError:
             continue
-        dictionary['build-date'] = "It's up to you"
         dictionary['pkgver'] = pkgver
         dictionary['source-revisions'] = dictionary['pkgname']
         template_json = datasource.to_json(dictionary)

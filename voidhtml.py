@@ -114,6 +114,9 @@ _DISPLAY_FIELD_NAMES = {
 }
 
 
+_RESTRICTED_BUILD_DATE = "It's up to you"
+
+
 def display_field_name(field):
     try:
         return _DISPLAY_FIELD_NAMES[field]
@@ -152,7 +155,10 @@ def make_pkg(row):
         pkg['repository'] = Repo(repo, row.restricted)
     pkg['mainpkgname'] = pkg.get('source-revisions', row.pkgname).split(':')[0]
     pkg['upstreamver'] = row.upstreamver
-    pkg['build-date'] = row.builddate
+    if row.builddate:
+        pkg['build-date'] = row.builddate
+    elif row.restricted:
+        pkg['build-date'] = _RESTRICTED_BUILD_DATE
     return pkg
 
 
