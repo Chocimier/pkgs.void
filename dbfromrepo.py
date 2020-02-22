@@ -20,7 +20,7 @@ import os
 import subprocess
 import sys
 from collections import defaultdict
-from sink import string_hash
+from datetime import datetime, timedelta
 
 import datasource
 
@@ -71,6 +71,8 @@ def templatedata(pkgname, arch):
 
 
 def build_db(source, repos):
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
     srcpkgs = os.path.join(DISTDIR, 'srcpkgs')
     for pkgname in os.listdir(srcpkgs):
         entry = os.path.join(srcpkgs, pkgname)
@@ -96,7 +98,6 @@ def build_db(source, repos):
                 dictionary['restricted'] = True
             source.create(datasource.PackageRow(
                 pkgname=pkgname,
-                pkgname_hash=string_hash(pkgname),
                 pkgver=pkgver,
                 arch='unknown-unknown',
                 restricted=dictionary['restricted'],
@@ -106,7 +107,7 @@ def build_db(source, repos):
                 depends_count=0,
                 upstreamver='',
                 repo=''
-            ))
+            ), dates=[today, tomorrow])
         else:
             source.update(
                 pkgname=pkgname,

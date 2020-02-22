@@ -21,10 +21,6 @@ def same(arg):
     return arg
 
 
-def string_hash(obj):
-    return '{:016x}'.format(abs(hash(obj)))[14:0:-1]
-
-
 def web_parameters():
     return {
         'root_url': config.ROOT_URL,

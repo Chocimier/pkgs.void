@@ -17,13 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
+from datetime import datetime, timedelta
 
 import datasource
 from repopaths import index_path, load_repo
-from sink import string_hash
 
 
 def build_db(source, repos):
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
     for repo in repos:
         path = index_path(repo)
         repodata = load_repo(path)
@@ -40,7 +42,6 @@ def build_db(source, repos):
             source.create(datasource.PackageRow(
                 arch=arch,
                 pkgname=pkgname,
-                pkgname_hash=string_hash(pkgname),
                 pkgver=dictionary['pkgver'],
                 restricted=False,
                 builddate='',
@@ -49,7 +50,7 @@ def build_db(source, repos):
                 depends_count=depends_count,
                 upstreamver='',
                 repo=repo
-            ))
+            ), dates=[today, tomorrow])
 
 
 if __name__ == '__main__':

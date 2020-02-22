@@ -1,3 +1,5 @@
+DAILY_HASH_BITS = 8
+
 DATASOURCE_CLASS = 'SqliteDataSource'
 
 DATASOURCE_ARGUMENTS = ['index.sqlite3']

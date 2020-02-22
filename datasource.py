@@ -15,19 +15,18 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import abc
+import hashlib
 import json
 import sqlite3
 from collections import namedtuple
 
 import config
-from sink import string_hash
 
 
 PackageRow = namedtuple(
     'PackageRow',
     (
         'pkgname',
-        'pkgname_hash',
         'pkgver',
         'arch',
         'restricted',
@@ -49,6 +48,37 @@ def from_json(text):
     return json.loads(text)
 
 
+def date_as_string(date):
+    return date.strftime('%Y-%m-%d')
+
+
+def dailyable(package_row):
+    return (
+        not package_row.repo.startswith('multilib')
+        and not package_row.pkgname.endswith('-devel')
+        and not package_row.pkgname.endswith('-dbg')
+    )
+
+
+def daily_hash(pkgname, date, bits=None):
+    '''We want to select small (around 50) subset of packages
+    with following properties:
+    - changing daily
+    - not partitioning: every pair of packages has chance to be chosen some day
+    - precomputable: not forcing to process every package to select
+    - adding or removing package do not affect choise of other packages
+    - size may vary
+    To achieve this, we compute hash of pair of pkgname and date.
+    Then package is chosen when such hash has common prefix with hash of date.
+    Lenght of prefix in bits is adjusted such that set has required size.
+    '''
+    string = pkgname + date_as_string(date)
+    hash_value = hashlib.md5(string.encode()).digest()
+    integer = int.from_bytes(hash_value, 'big')
+    binary = "{num:0{width}b}".format(num=integer, width=8*len(hash_value))
+    return binary[:bits]
+
+
 class Datasource(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def __enter__(self):
@@ -59,8 +89,9 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Exits runtime context.'''
 
     @abc.abstractmethod
-    def create(self, package_row):
-        '''Saves information about package into database.'''
+    def create(self, package_row, dates):
+        '''Saves information about package into database.
+        Computes if it is daily package, and register if so.'''
 
     @abc.abstractmethod
     def read(self, **kwargs):
@@ -108,7 +139,6 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create table if not exists packages (
             arch text not null,
             pkgname text not null,
-            pkgname_hash text not null,
             pkgver text not null,
             restricted integer not null,
             builddate text not null,
@@ -117,6 +147,12 @@ class SqliteDataSource(Datasource):
             depends_count integer,
             upstreamver text not null,
             repo text not null)
+            ''')
+        self._cursor.execute('''create table if not exists daily_hash (
+            pkgname text not null,
+            date text not null,
+            unique(pkgname, date)
+            )
             ''')
 
     def __enter__(self):
@@ -127,13 +163,32 @@ class SqliteDataSource(Datasource):
             self._db.commit()
         self._db.close()
 
-    def create(self, package_row):
-        '''Saves information about package into database.'''
+    def create(self, package_row, dates):
+        '''Saves information about package into database.
+        Computes if it is daily package, and register if so.'''
         query = 'INSERT INTO packages ({}) VALUES ({})'.format(
             ', '.join(PackageRow._fields),
             ', '.join('?' * len(package_row))
         )
         self._cursor.execute(query, package_row)
+        self._add_daily_hashes(package_row, dates)
+
+    def _add_daily_hashes(self, package_row, dates):
+        if not dailyable(package_row):
+            return
+        hash_query = '''INSERT OR IGNORE INTO daily_hash (pkgname, date)
+            VALUES (?, ?)'''
+        for date in dates:
+            hash_value = daily_hash(
+                package_row.pkgname,
+                date,
+                config.DAILY_HASH_BITS
+            )
+            if daily_hash('', date).startswith(hash_value):
+                self._cursor.execute(
+                    hash_query,
+                    (package_row.pkgname, date_as_string(date))
+                )
 
     def read(self, **kwargs):
         '''Finds packages that match criteria passed as keyword arguments.'''
@@ -183,14 +238,11 @@ class SqliteDataSource(Datasource):
     def of_day(self, date):
         '''Returns different packages every day'''
         query = (
-            'select distinct pkgname from packages '
-            'where repo not like "multilib%" '
-            'and pkgname not like "%-devel" '
-            'and pkgname not like "%-dbg" '
-            'and pkgname_hash like ? || "%"'
+            'select pkgname from daily_hash '
+            'where date = ?'
             'order by pkgname'
         )
-        self._cursor.execute(query, [string_hash(date)[:2]])
+        self._cursor.execute(query, [date_as_string(date)])
         return (x[0] for x in self._cursor.fetchall())
 
     def metapackages(self):
@@ -263,9 +315,9 @@ class SqliteDataSource(Datasource):
             depends_count
             )
             ''')
-        self._cursor.execute('''create index if not exists pkgname_hash_idx
-            on packages (
-            pkgname_hash
+        self._cursor.execute('''create index if not exists daily_hash_idx
+            on daily_hash (
+            date
             )
             ''')
 
