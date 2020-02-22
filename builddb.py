@@ -43,12 +43,8 @@ def build_db(source, repos):
                 arch=arch,
                 pkgname=pkgname,
                 pkgver=dictionary['pkgver'],
-                restricted=False,
-                builddate='',
-                repodata=datasource.to_json(dictionary),
-                templatedata=datasource.to_json({}),
+                repodata=dictionary,
                 depends_count=depends_count,
-                upstreamver='',
                 repo=repo
             ), dates=[today, tomorrow])
 

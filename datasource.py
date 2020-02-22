@@ -21,9 +21,10 @@ import sqlite3
 from collections import namedtuple
 
 import config
+from xbps import pkgname_from_pkgver
 
 
-PackageRow = namedtuple(
+_PackageRow = namedtuple(
     'PackageRow',
     (
         'pkgname',
@@ -38,6 +39,42 @@ PackageRow = namedtuple(
         'repo',
     )
 )
+
+
+class PackageRow(_PackageRow):
+    def __new__(
+            cls,
+            *,
+            pkgver,
+            arch,
+            repo,
+            pkgname=None,
+            restricted=False,
+            builddate='',
+            repodata=None,
+            templatedata=None,
+            depends_count=None,
+            upstreamver='',
+    ):
+        # pylint: disable=too-many-arguments
+        # pylint: disable=unused-argument
+        def to_jsondata(arg):
+            if isinstance(arg, str):
+                return arg
+            if arg is None:
+                return to_json({})
+            return to_json(arg)
+        if not pkgname:
+            pkgname = pkgname_from_pkgver(pkgver)
+        repodata = to_jsondata(repodata)
+        templatedata = to_jsondata(templatedata)
+        function_locals = locals()
+        fields = {f: function_locals[f] for f in _PackageRow._fields}
+        return super().__new__(cls, **fields)
+
+    @staticmethod
+    def from_record(record):
+        return PackageRow(**dict(zip(_PackageRow._fields, record)))
 
 
 def to_json(dictionary):
@@ -193,7 +230,7 @@ class SqliteDataSource(Datasource):
             ' AND '.join(f'{i} = ?' for i in fixed)
         )
         self._cursor.execute(query, [kwargs[i] for i in fixed])
-        return (PackageRow(*x) for x in self._cursor.fetchall())
+        return (PackageRow.from_record(x) for x in self._cursor.fetchall())
 
     def list_all(self):
         '''Returns list of all packages.'''
@@ -201,7 +238,7 @@ class SqliteDataSource(Datasource):
             ', '.join(PackageRow._fields),
         )
         self._cursor.execute(query)
-        return [PackageRow(*x) for x in self._cursor.fetchall()]
+        return (PackageRow.from_record(x) for x in self._cursor.fetchall())
 
     @staticmethod
     def _sets(argname):
