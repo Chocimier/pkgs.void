@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -152,6 +152,7 @@ def make_pkg(row):
         pkg['repository'] = Repo(repo, row.restricted)
     pkg['mainpkgname'] = pkg.get('source-revisions', row.pkgname).split(':')[0]
     pkg['upstreamver'] = row.upstreamver
+    pkg['build-date'] = row.builddate
     return pkg
 
 

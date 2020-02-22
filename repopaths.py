@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,6 +21,9 @@ import plistlib
 import sys
 
 
+DATADIR = 'data'
+
+
 def directory_name(repo):
     result = ''
     for i in ('multilib', 'nonfree', 'debug'):
@@ -30,8 +33,24 @@ def directory_name(repo):
     return result
 
 
+def rsync_path(repo):
+    result = ''
+    for part in repo.split('/')[:-1]:
+        result += part + '/'
+    return result
+
+
+def rsync_filename(path):
+    return 'rsync-' + path.strip('/').replace('/', '_')
+
+
+def rsync_load(repo):
+    filename = rsync_filename(rsync_path(repo))
+    return open(os.path.join(DATADIR, filename))
+
+
 def index_path(repo):
-    return os.path.join('data', directory_name(repo), 'index.plist')
+    return os.path.join(DATADIR, directory_name(repo), 'index.plist')
 
 
 def load_repo(path):
@@ -43,8 +62,22 @@ def load_repo(path):
         return None
 
 
-def usage(script_name):
-    print(f'usage: {script_name} directory_name path', file=sys.stderr)
+_COMMANDS = {
+    'directory_name': directory_name,
+    'rsync_path': rsync_path,
+    'rsync_filename': rsync_filename,
+}
+
+
+def usage(script_name, bad_command=None):
+    def show(string):
+        print(string, file=sys.stderr)
+    show(f'usage: {script_name} <command> path')
+    if bad_command is not None:
+        show(f'{bad_command} is not known command')
+    show('commands:')
+    for command in _COMMANDS:
+        show(f'  {command}')
 
 
 def main(*args):
@@ -54,11 +87,12 @@ def main(*args):
         usage(args[0])
         sys.exit(1)
 
-    if command == 'directory_name':
-        print(directory_name(arg))
-    else:
-        usage(script_name)
+    try:
+        func = _COMMANDS[command]
+    except KeyError:
+        usage(script_name, command)
         sys.exit(1)
+    print(func(arg))
 
 
 if __name__ == '__main__':

@@ -19,6 +19,7 @@
 # This script updates packages database and published source tarball.
 
 mirror=https://alpha.de.repo.voidlinux.org
+rsyncmirror=rsync://alpha.de.repo.voidlinux.org/voidmirror/current/
 download=yes
 templates=
 updates=
@@ -76,6 +77,13 @@ for path in $repos; do
 	tar xf "$filename" -C "$extract_dir"
 done
 
+for path in $repos; do
+	echo "$(../repopaths.py rsync_path "$path")"
+done | sort -u | while read dir; do
+	filename="$(../repopaths.py rsync_filename "$dir")"
+	[ "$download" ] && rsync --list-only "${rsyncmirror}${dir}" --include '*.xbps' --exclude='*' > "${filename}"
+done
+
 [ "$download" ] && [ "$updates" ] && wget -q -O void-updates.txt "$mirror/void-updates/void-updates.txt"
 
 cd .. || exit 1
@@ -84,6 +92,7 @@ rm -f newindex.sqlite3
 ./builddb.py $repos
 [ "$templates" ] && ./dbfromrepo.py $repos
 [ "$updates" ] && ./updates.py $repos
+./rsyncdata.py $repos
 
 mv newindex.sqlite3 index.sqlite3
 

@@ -217,6 +217,11 @@ class SqliteDataSource(Datasource):
             pkgname
             )
             ''')
+        self._cursor.execute('''create index if not exists pkgver_idx
+            on packages (
+            pkgver
+            )
+            ''')
         self._cursor.execute('''create index if not exists builddate_idx
             on packages (
             builddate desc
