@@ -1,0 +1,4 @@
+#!/bin/sh
+
+pylint --rcfile .pylint *.py || exit 1
+flake8 *.py || exit 1
