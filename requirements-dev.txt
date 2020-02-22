@@ -1,2 +1,3 @@
 flake8==3.7.9
+gprof2dot==2019.11.30
 pylint==2.4.4

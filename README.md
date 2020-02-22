@@ -7,6 +7,7 @@ Running:
  `python3 -m virtualenv -p python3 venv && . venv/bin/activate`
 3. Install dependencies: `pip install -r requirements.txt`
  From non-python tools, rsync and wget is needed.
+ Graphviz is used by profiling script.
 4. Generate database: `./update.sh`. This step publish whole directory on your
  instance of catalog, accordingly to AGPL license.
 5. Run: `./serve.py`

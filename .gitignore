@@ -3,3 +3,4 @@ static/generated/
 static/source/
 venv/
 *.sqlite3
+profile.*
