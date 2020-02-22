@@ -107,11 +107,6 @@ class Datasource(metaclass=abc.ABCMeta):
         and sets values passed as keyword arguments prefixed with 'set_'.'''
 
     @abc.abstractmethod
-    def delete(self, **kwargs):
-        '''Removes from storage packages that match criteria
-        passed as keyword arguments'''
-
-    @abc.abstractmethod
     def of_day(self, date):
         '''Returns different packages every day'''
 
@@ -229,11 +224,6 @@ class SqliteDataSource(Datasource):
             ' AND '.join('{} = ?'.format(i) for i in fixed)
         )
         self._cursor.execute(query, [kwargs[i] for i in updated + fixed])
-
-    def delete(self, **kwargs):
-        '''Removes from storage packages that match criteria
-        passed as keyword arguments'''
-        ...
 
     def of_day(self, date):
         '''Returns different packages every day'''
