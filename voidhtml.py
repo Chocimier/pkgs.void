@@ -22,6 +22,7 @@ import datasource
 import present
 from custom_types import Binpkgs, Field, FoundPackages, Repo, ValueAt
 from sink import same
+from xbps import split_arch, verrev_from_pkgver, version_from_verrev
 
 
 class RelevantProperty:
@@ -35,24 +36,6 @@ class RelevantProperty:
         self.formatter = formatter or same
         self.combiner = combiner or present.combine_simple
         self.parser = parser or same
-
-
-DEFAULT_LIBC = 'glibc'
-
-
-def split_arch(arch):
-    try:
-        iset, libc = arch.split('-')
-    except ValueError:
-        iset = arch
-        libc = DEFAULT_LIBC
-    return iset, libc
-
-
-def join_arch(iset, libc):
-    if not libc or libc == DEFAULT_LIBC:
-        return iset
-    return f'{iset}-{libc}'
 
 
 def _relevant_props():
@@ -151,8 +134,8 @@ def separate_repository(row):
 def make_pkg(row):
     pkg = datasource.from_json(row.templatedata)
     pkg.update(datasource.from_json(row.repodata))
-    pkg['verrev'] = pkg['pkgver'].rpartition('-')[-1]
-    pkg['version'] = pkg['verrev'].partition('_')[0]
+    pkg['verrev'] = verrev_from_pkgver(pkg['pkgver'])
+    pkg['version'] = version_from_verrev(pkg['verrev'])
     iset, libc = split_arch(row.arch)
     pkg['iset'] = iset
     pkg['libc'] = libc
