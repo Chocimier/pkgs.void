@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -101,6 +101,7 @@ def build_db(source, repos):
                 pkgver=pkgver,
                 arch='unknown-unknown',
                 restricted=dictionary['restricted'],
+                builddate='',
                 repodata='{}',
                 templatedata=template_json,
                 upstreamver='',
