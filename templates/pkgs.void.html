@@ -4,14 +4,34 @@
       xmlns:xi="http://www.w3.org/2001/XInclude">
 <xi:include href="base.html"/>
 <head>
-    <title>${pkgname} from Void</title>
+  <title>${pkgname} from Void</title>
+  <py:def function="minmax(field)"><!--!
+ --><py:with vars="min=field.presentation.formatter(field.value.min); max=field.presentation.formatter(field.value.max)"><!--!
+   --><py:choose test="min"><!--!
+     --><py:when test="max">${min}</py:when><!--!
+     --><py:otherwise>${min} - ${max}</py:otherwise><!--!
+   --></py:choose><!--!
+ --></py:with><!--!
+--></py:def>
+  <py:def function="list_with_archs(param)"><!--!
+   --><ul py:with="bullet_list = (len(param.value) == 1)" py:strip="bullet_list"><!--!
+     --><li py:for="value in param.value"
+            py:with="masks = masks_presenter(value.coords, param.presentation.space)"
+            py:strip="bullet_list"
+          ><span class="masked"
+              py:strip="not masks or not bullet_list"
+            >${param.presentation.formatter(value.value)}<!--!
+         --><aside py:if="masks"> [${masks}]</aside><py:if test="not bullet_list">
+</py:if></span></li><!--!
+   --></ul><!--!
+--></py:def>
 </head>
 <body>
     <div class="content">
         <main>
             <div class="column">
                  <h2>${pkgname}</h2>
-                 <p>${short_desc}</p>
+                 <p>${list_with_archs(short_desc)}</p>
                  <py:if test="single_pkg">
                      <hr/>
                      <p py:with="version=next(next(versions.by_iset).by_libc)">Build for ${version.data.iset}-${version.data.libc}, version
@@ -42,13 +62,23 @@
                  <dl py:if="fields">
                  <py:for each="field in fields">
                      <dt>${field.title}:</dt>
-                     <dd>${field.value}</dd>
+                     <dd><!--!
+                    --><py:choose test="field.presentation.presenter"><!--!
+                      --><py:when test="None">${list_with_archs(field)}</py:when><!--!
+                      --><py:when test="'minmax'">${minmax(field)}</py:when><!--!
+                      --><py:otherwise>${field.value}</py:otherwise><!--!
+                    --></py:choose><!--!
+                  --></dd>
                  </py:for>
                  </dl>
                  </div>
             </main>
         <aside>
-            <a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${mainpkg.pkgname}/template">Package template</a>
+            <py:for each="template in mainpkg.pkgname.value"><!--!
+           --><a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template<!--!
+            --><py:if test="len(mainpkg.pkgname.value) > 1"> (${template})</py:if><!--!
+            --></a><!--!
+        --></py:for>
         </aside>
     </div>
 </body>

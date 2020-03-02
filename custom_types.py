@@ -63,7 +63,7 @@ class Binpkgs:
             yield version
 
 
-Field = namedtuple('Field', ('name', 'title', 'value'))
+Field = namedtuple('Field', ('name', 'title', 'value', 'presentation'))
 
 
 FoundPackages = namedtuple('FoundPackages', ('parameters', 'other'))

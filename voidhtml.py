@@ -17,6 +17,7 @@
 import datetime
 import sys
 from collections import Counter, OrderedDict, defaultdict
+from itertools import chain
 
 import datasource
 import present
@@ -39,55 +40,86 @@ class RelevantProperty:
 
 
 def _relevant_props():
-    def to_template(value):
-        if value.repo == 'restricted':
-            return 'restricted'
-        return 'additional'
     data = (
         {'name': 'short_desc'},
-        {'name': 'homepage', 'formatter': present.as_link},
+        {'name': 'homepage'},
         {'name': 'license'},
-        {'name': 'maintainer', 'parser': present.parse_contact},
-        {'name': 'changelog', 'formatter': present.as_link},
-        {'name': 'repository', 'combiner': present.combine_with_template({
-            'directory': 'repository',
-            'to_template': to_template,
-        })},
+        {
+            'name': 'maintainer',
+            'parser': present.parse_contact
+        },
+        {'name': 'changelog'},
+        {'name': 'repository'},
         {
             'name': 'build-date',
-            'formatter': present.as_date,
             'combiner': present.combine_minmax
         },
         {'name': 'build-options'},
-        {'name': 'distfiles', 'islist': True},
+        {
+            'name': 'distfiles',
+            'islist': True
+        },
         {
             'name': 'installed_size',
-            'formatter': present.as_size,
             'combiner': present.combine_minmax
         },
         {
             'name': 'conflicts',
-            'formatter': present.as_package,
             'islist': True
         },
         {
             'name': 'provides',
-            'formatter': present.as_package,
             'islist': True
         },
-        {'name': 'reverts', 'islist': True},
-        {'name': 'mainpkgname', 'combiner': present.combine_simple},
-        {'name': 'upstreamver', 'combiner': present.combine_set},
-        {'name': 'shlib-provides', 'islist': True},
+        {
+            'name': 'reverts',
+            'islist': True
+        },
+        {
+            'name': 'mainpkgname',
+            'combiner': present.combine_set
+        },
+        {
+            'name': 'upstreamver',
+            'combiner': present.combine_set
+        },
+        {
+            'name': 'shlib-provides',
+            'islist': True
+        },
         {
             'name': 'run_depends',
-            'formatter': present.as_package,
             'islist': True
         },
     )
     result = OrderedDict()
     for row in data:
         result[row['name']] = RelevantProperty(**row)
+    return result
+
+
+def _props_presentation(field):
+    presentation = {
+        'homepage': {'formatter': present.as_link},
+        'changelog': {'formatter': present.as_link},
+        'repository': {'formatter': present.as_repository},
+        'build-date': {
+            'formatter': present.as_date,
+            'presenter': 'minmax',
+        },
+        'installed_size': {
+            'formatter': present.as_size,
+            'presenter': 'minmax',
+        },
+        'conflicts': {'formatter': present.as_package},
+        'provides': {'formatter': present.as_package},
+        'run_depends': {'formatter': present.as_package},
+    }
+    result = {
+        'formatter': same,
+        'presenter': None,
+        **presentation.get(field, {})
+    }
     return result
 
 
@@ -159,19 +191,15 @@ def get_space(versions):
     return space
 
 
-def combine_fields(fields_dic, versions, pkgname):
+def combine_fields(fields_dic, versions):
     fields = []
     space = get_space(versions)
     for field in fields_dic:
         prop = _RELEVANT_PROPS[field]
         field_title = display_field_name(field)
-        field_content = prop.combiner(
-            prop,
-            fields_dic[field],
-            space=space,
-            pkgname=pkgname
-        )
-        fields.append(Field(field, field_title, field_content))
+        field_content = prop.combiner(prop, fields_dic[field])
+        presentation = {'space': space}
+        fields.append(Field(field, field_title, field_content, presentation))
     return fields
 
 
@@ -201,7 +229,7 @@ def separate_fields(fields, separate):
     separated = {}
     for field in fields:
         if field.name in separate:
-            separated[field.name] = field.value
+            separated[field.name] = field
         else:
             kept.append(field)
     fields[:] = kept
@@ -222,9 +250,9 @@ def data_generator(pkgname, repos):
         fields_dic_append(fields_dic, pkg)
     if not binpkgs:
         return FoundPackages(None, other_archs)
-    fields = combine_fields(fields_dic, binpkgs, pkgname)
+    fields = combine_fields(fields_dic, binpkgs)
     separated = separate_fields(fields, SEPARATED_FIELDS)
-    upstreamver = new_versions(binpkgs, separated['upstreamver'])
+    upstreamver = new_versions(binpkgs, separated['upstreamver'].value)
     return FoundPackages({
         'pkgname': pkgname,
         'short_desc': separated['short_desc'],
@@ -244,8 +272,10 @@ def page_generator(pkgname, repos, single=False):
             'other_archs': found.other,
         }
         return present.render_template('nopkg.html', **parameters)
-    template = '{}.void.html'.format('pkgs')
-    return present.render_template(template, single_pkg=single, **parameters)
+    for field in chain(parameters['fields'], [parameters['short_desc']]):
+        field.presentation.update(_props_presentation(field.name))
+    parameters['single_pkg'] = single
+    return present.render_template('pkgs.void.html', **parameters)
 
 
 def list_all():

@@ -19,16 +19,18 @@ from collections import Counter, namedtuple
 from genshi.builder import Element
 from genshi.output import XMLSerializer
 from genshi.template import TemplateLoader
-from genshi.template.loader import TemplateNotFound
 from genshi.template.markup import Markup
 from humanize import naturalsize
 
 from custom_types import ValueAt
-from sink import same, web_parameters
+from sink import web_parameters
 from config import ROOT_URL
 
 
 _LOADER = TemplateLoader('templates')
+
+
+Area = namedtuple('Area', ('value', 'coords'))
 
 
 def _serializer(**kwargs):
@@ -43,10 +45,23 @@ def render_link(href, text):
     return Element('a', href=href)(text)
 
 
+def _masks_as_string(masks_set):
+    return ', '.join(map('-'.join, masks_set))
+
+
+def _masks_presenter(values, space):
+    masks_set = _masks(values, space) or {}
+    return _masks_as_string(masks_set)
+
+
 def render_template(template_path, **kwargs):
     template = _LOADER.load(template_path)
     template.serializer = _serializer
-    return Markup(template.generate(**web_parameters(), **kwargs))
+    return Markup(template.generate(
+        masks_presenter=_masks_presenter,
+        **web_parameters(),
+        **kwargs
+    ))
 
 
 def as_new_version(versions):
@@ -97,6 +112,14 @@ def as_date(value):
     return value
 
 
+def as_repository(value):
+    name = 'restricted' if value.repo == 'restricted' else 'additional'
+    return render_template(
+        f'present/repository/{name}.html',
+        **value._asdict()
+    )
+
+
 def as_size(value):
     return naturalsize(value, binary=True, format='%.2f')
 
@@ -132,113 +155,28 @@ def _masks(elems, space):
     return [_mask(elems, dim, point, space) for point in points]
 
 
-def _as_mask(masks):
-    if not masks:
-        return ''
-    return ', '.join('-'.join(mask) for mask in masks)
-
-
-CombineWithTemplatesConfig = namedtuple(
-    'CombineWithTemplatesConfig',
-    (
-        'single_plain',
-        'directory',
-        'top_template',
-        'to_template',
-    )
-)
-
-
-COMBINE_TEMPLATE_DEFAULTS = {
-    'single_plain': True,
-    'directory': 'generic',
-    'top_template': 'list',
-    'to_template': lambda x: 'entry',
-}
-
-
-def combine_simple(prop, values, space, pkgname):
-    config = CombineWithTemplatesConfig(**COMBINE_TEMPLATE_DEFAULTS)
-    return combine_with_templates(prop, values, space, pkgname, config=config)
-
-
-def combine_with_template(config=None):
-    config = config or {}
-    conf = CombineWithTemplatesConfig(
-        **{
-            **COMBINE_TEMPLATE_DEFAULTS,
-            **{
-                'single_plain': False,
-                'top_template': 'top',
-            },
-            **config
-        }
-    )
-    return (lambda prop, values, space, pkgname:
-            combine_with_templates(prop, values, space, pkgname, conf))
-
-
-def group_variants(prop, values, space, config):
-    distinct = set(i.value for i in values)
-    if len(distinct) == 1 and config.single_plain:
-        return prop.formatter(distinct.pop()), True
-    distinct = sorted(distinct)
-    variants = []
-    for value in distinct:
-        coords_of_value = [i.coords for i in values if i.value == value]
-        mask = _as_mask(_masks(coords_of_value, space))
-        variants.append({'value': prop.formatter(value), 'mask': mask})
-    return variants, False
-
-
-def combine_with_templates(prop, values, space, pkgname, config=None):
-    conf = config or CombineWithTemplatesConfig(
-        single_plain=False,
-        directory=prop.name,
-        top_template='top',
-        to_template=same,
-    )
+def combine_simple(prop, values):
     if prop.islist:
         values = [
             ValueAt(val, sublist.coords)
             for sublist in values
             for val in sublist.value
         ]
-    variants, final = group_variants(prop, values, space, conf)
-    if final:
-        return variants
-    entries = Markup('')
-    for variant in variants:
-        template_name = conf.to_template(variant['value'])
-        template_path = f'present/{conf.directory}/{template_name}.html'
-        params = {
-            'pkgname': pkgname,
-            'elem': variant,
-        }
-        try:
-            entries += render_template(template_path, **params)
-        except TemplateNotFound:
-            continue
-    if entries:
-        template_name = conf.top_template
-        template_path = f'present/{conf.directory}/{template_name}.html'
-        try:
-            return render_template(template_path, content=entries)
-        except TemplateNotFound:
-            return ''
-    return ''
+    distinct = sorted({i.value for i in values})
+    variants = []
+    for value in distinct:
+        coords_of_value = [i.coords for i in values if i.value == value]
+        variants.append(Area(value, coords_of_value))
+    return variants
 
 
-def combine_minmax(prop, values, **kwargs):
-    del kwargs
-    minimum = prop.formatter(min(i.value for i in values))
-    maximum = prop.formatter(max(i.value for i in values))
-    if minimum == maximum:
-        return minimum
-    return f'{minimum} - {maximum}'
-
-
-def combine_set(prop, values, **kwargs):
+def combine_minmax(prop, values):
     del prop
-    del kwargs
+    minimum = min(i.value for i in values)
+    maximum = max(i.value for i in values)
+    return {'min': minimum, 'max': maximum}
+
+
+def combine_set(prop, values):
+    del prop
     return set(i.value for i in values)
