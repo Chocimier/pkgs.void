@@ -37,6 +37,7 @@ _PackageRow = namedtuple(
         'depends_count',
         'upstreamver',
         'repo',
+        'popularity',
     )
 )
 
@@ -55,6 +56,7 @@ class PackageRow(_PackageRow):
             templatedata=None,
             depends_count=None,
             upstreamver='',
+            popularity=0,
     ):
         # pylint: disable=too-many-arguments
         # pylint: disable=unused-argument
@@ -152,6 +154,11 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Finds names of _count_ most recently build packages'''
 
     @abc.abstractmethod
+    def popular(self, at_most):
+        '''Finds names of packages being more popular than
+        at_most-th most popular package'''
+
+    @abc.abstractmethod
     def longest_names(self, at_most):
         '''Finds names of packages having name longer than
         at_most-th longest-name-bearing package'''
@@ -178,7 +185,8 @@ class SqliteDataSource(Datasource):
             templatedata text not null,
             depends_count integer,
             upstreamver text not null,
-            repo text not null)
+            repo text not null,
+            popularity integer default 0)
             ''')
         self._cursor.execute('''create table if not exists daily_hash (
             pkgname text not null,
@@ -297,6 +305,24 @@ class SqliteDataSource(Datasource):
         self._cursor.execute(query, [int(count)])
         return (x[0] for x in self._cursor.fetchall())
 
+    def popular(self, at_most):
+        '''Finds names of packages being more popular than
+        at_most-th most popular package'''
+        query = (
+            'select distinct pkgname from packages '
+            'where popularity > ('
+            '  select popularity from ('
+            '    select distinct pkgname, popularity '
+            '    from packages '
+            '  )'
+            '  order by popularity desc'
+            '  limit 1 offset ?'
+            ')'
+            'order by popularity desc'
+        )
+        self._cursor.execute(query, [int(at_most)])
+        return (x[0] for x in self._cursor.fetchall())
+
     def longest_names(self, at_most):
         '''Finds names of packages having name longer than
         at_most-th longest-name-bearing package'''
@@ -340,6 +366,11 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create index if not exists depends_count_idx
             on packages (
             depends_count
+            )
+            ''')
+        self._cursor.execute('''create index if not exists popularity_idx
+            on packages (
+            popularity
             )
             ''')
         self._cursor.execute('''create index if not exists daily_hash_idx

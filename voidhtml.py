@@ -75,6 +75,7 @@ def _relevant_props():
             'name': 'reverts',
             'islist': True
         },
+        {'name': 'popularity'},
         {
             'name': 'mainpkgname',
             'combiner': present.combine_set
@@ -113,6 +114,7 @@ def _props_presentation(field):
         },
         'conflicts': {'formatter': present.as_package},
         'provides': {'formatter': present.as_package},
+        'popularity': {'formatter': present.as_popularity},
         'run_depends': {'formatter': present.as_package},
     }
     result = {
@@ -180,6 +182,8 @@ def make_pkg(row):
         pkg['build-date'] = row.builddate
     elif row.restricted:
         pkg['build-date'] = _RESTRICTED_BUILD_DATE
+    if row.popularity:
+        pkg['popularity'] = row.popularity
     return pkg
 
 
@@ -330,6 +334,18 @@ def longest_names():
     parameters = {
         'title': 'Packages with longest names',
         'packages': packages,
+    }
+    return present.render_template('list.html', **parameters)
+
+
+def popular():
+    source = datasource.factory()
+    packages = source.popular(25)
+    parameters = {
+        'title': 'Most popular packages',
+        'subtitle': 'as reported by volunteers running PopCorn',
+        'packages': packages,
+        'with_devel_and_so': True,
     }
     return present.render_template('list.html', **parameters)
 

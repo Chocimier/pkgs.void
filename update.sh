@@ -23,6 +23,7 @@ rsyncmirror=rsync://alpha.de.repo.voidlinux.org/voidmirror/current/
 download=yes
 templates=
 updates=
+popularity=yes
 
 cd "$(dirname "$0")" || exit 1
 [ -r ./profile ] && . ./profile
@@ -36,6 +37,7 @@ do
             shift
             mirror="$1"
             ;;
+        -P) popularity= ;;
         -t) templates=yes ;;
         -u) updates=yes ;;
         *) break
@@ -85,6 +87,9 @@ done | sort -u | while read dir; do
 done
 
 [ "$download" ] && [ "$updates" ] && wget -q -O void-updates.txt "$mirror/void-updates/void-updates.txt"
+[ "$download" ] && [ "$popularity" ] &&
+  wget -q -O popcorn.today.json "http://popcorn.voidlinux.org/popcorn_$(date +%Y-%m-%d).json" &&
+  mv popcorn.today.json popcorn.json
 
 cd .. || exit 1
 
@@ -92,6 +97,7 @@ rm -f newindex.sqlite3
 ./builddb.py $repos
 [ "$templates" ] && ./dbfromrepo.py $repos
 [ "$updates" ] && ./updates.py $repos
+[ "$popularity" ] && ./popularity.py
 ./rsyncdata.py $repos
 
 mv newindex.sqlite3 index.sqlite3

@@ -25,7 +25,7 @@ from genshi.template import TemplateLoader
 from config import DEVEL_MODE, ROOT_URL, REPOS
 from voidhtml import (
     lists_index, longest_names, metapackages,
-    newest, of_day, page_generator
+    newest, of_day, page_generator, popular
 )
 from xbps import join_arch
 
@@ -51,6 +51,7 @@ route('/toc')(lists_index)
 route('/of_day')(of_day)
 route('/newest')(newest)
 route('/sets')(metapackages)
+route('/popular')(popular)
 route('/longest_names')(longest_names)
 
 

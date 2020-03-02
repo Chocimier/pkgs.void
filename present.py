@@ -118,6 +118,10 @@ def as_date(value):
     return value
 
 
+def as_popularity(value):
+    return f'{value}%'
+
+
 def as_repository(value):
     name = 'restricted' if value.repo == 'restricted' else 'additional'
     return render_template(
