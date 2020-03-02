@@ -11,6 +11,7 @@
     <div class="content">
         <main>
             <h1>${title}</h1>
+            <em py:if="defined('subtitle')">${subtitle}</em>
             <ol>
                 <li py:for="i in packages">
                     <a href="${root_url}/package/${i}">${i}</a>
