@@ -53,6 +53,10 @@ ul {
 	columns: 40ch 2;
 }
 
+ul.continuous {
+	columns: auto 1;
+}
+
 li {
     break-inside: avoid;
 }

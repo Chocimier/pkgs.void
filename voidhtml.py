@@ -333,6 +333,10 @@ def longest_names():
     return present.render_template('list.html', **parameters)
 
 
+def lists_index():
+    return present.render_template('toc.html')
+
+
 def main():
     print(page_generator(sys.argv[1], sys.argv[2:]))
 

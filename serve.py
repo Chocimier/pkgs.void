@@ -24,7 +24,8 @@ from genshi.template import TemplateLoader
 
 from config import DEVEL_MODE, ROOT_URL, REPOS
 from voidhtml import (
-    longest_names, metapackages, newest, of_day, page_generator
+    lists_index, longest_names, metapackages,
+    newest, of_day, page_generator
 )
 from xbps import join_arch
 
@@ -46,6 +47,7 @@ def list_all_():
     return static_file('all.html', 'static/generated')
 
 
+route('/toc')(lists_index)
 route('/of_day')(of_day)
 route('/newest')(newest)
 route('/sets')(metapackages)
