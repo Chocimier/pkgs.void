@@ -63,7 +63,12 @@ def _timeit(func):
 
 def _profile_run(code):
     cProfile.run(code, filename='profile.log')
-    gprof2dot.main(['-f', 'pstats', 'profile.log', '-o', 'profile.dot'])
+    gprof2dot.main([
+        '-f', 'pstats',
+        '--color-nodes-by-selftime',
+        '-o', 'profile.dot',
+        'profile.log',
+    ])
     subprocess.call(['dot', '-Tsvg', '-oprofile.svg', 'profile.dot'])
 
 
