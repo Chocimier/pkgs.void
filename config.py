@@ -6,6 +6,8 @@ DATASOURCE_ARGUMENTS = ['index.sqlite3']
 
 DATASOURCE_ARGUMENTS_TEMPORARY = ['newindex.sqlite3']
 
+DEVEL_MODE = False
+
 ROOT_URL = '/pkgs.void'
 
 REPOS = [

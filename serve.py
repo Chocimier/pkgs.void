@@ -22,7 +22,7 @@ from bottle import ServerAdapter, default_app, error, redirect
 from bottle import request, route, run, server_names, static_file
 from genshi.template import TemplateLoader
 
-from config import ROOT_URL, REPOS
+from config import DEVEL_MODE, ROOT_URL, REPOS
 from voidhtml import (
     longest_names, metapackages, newest, of_day, page_generator
 )
@@ -145,7 +145,7 @@ def serve(args):
     except IndexError:
         pass
 
-    run(app=application, debug=True, **kwargs)
+    run(app=application, debug=True, reloader=DEVEL_MODE, **kwargs)
 
 
 if __name__ == '__main__':

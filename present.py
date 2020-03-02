@@ -24,13 +24,19 @@ from humanize import naturalsize
 
 from custom_types import ValueAt
 from sink import web_parameters
-from config import ROOT_URL
+from config import DEVEL_MODE, ROOT_URL
 
 
-_LOADER = TemplateLoader('templates')
+_CACHED_LOADER = TemplateLoader('templates')
 
 
 Area = namedtuple('Area', ('value', 'coords'))
+
+
+def _loader():
+    if DEVEL_MODE:
+        return TemplateLoader('templates')
+    return _CACHED_LOADER
 
 
 def _serializer(**kwargs):
@@ -55,7 +61,7 @@ def _masks_presenter(values, space):
 
 
 def render_template(template_path, **kwargs):
-    template = _LOADER.load(template_path)
+    template = _loader().load(template_path)
     template.serializer = _serializer
     return Markup(template.generate(
         masks_presenter=_masks_presenter,
