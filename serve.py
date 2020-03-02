@@ -46,24 +46,10 @@ def list_all_():
     return static_file('all.html', 'static/generated')
 
 
-@route('/of_day')
-def of_day_():
-    return of_day()
-
-
-@route('/newest')
-def newest_():
-    return newest()
-
-
-@route('/sets')
-def metapackages_():
-    return metapackages()
-
-
-@route('/longest_names')
-def longest_names_():
-    return longest_names()
+route('/of_day')(of_day)
+route('/newest')(newest)
+route('/sets')(metapackages)
+route('/longest_names')(longest_names)
 
 
 @route('/package')
