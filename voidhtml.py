@@ -309,6 +309,7 @@ def metapackages():
     parameters = {
         'title': 'Package sets',
         'packages': packages,
+        'with_devel_and_so': True,
     }
     return present.render_template('list.html', **parameters)
 

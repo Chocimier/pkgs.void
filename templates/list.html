@@ -15,7 +15,8 @@
                     <a href="${root_url}/package/${i}">${i}</a>
                 </li>
             </ol>
-            <footer>List excludes devel, debug and multilib packages.</footer>
+            <footer py:if="not defined('with_devel_and_so') or not with_devel_and_so"
+            >List excludes devel, debug and multilib packages.</footer>
         </main>
     </div>
     <footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>
