@@ -58,7 +58,11 @@ then
     git checkout -q xbps-src-p || exit $?
     if [ "$download" ]
     then
-        git fetch -q origin || exit $?
+        git fetch xbps-src-p -q &&
+        git checkout --detach -q &&
+        git branch -f xbps-src-p xbps-src-p/xbps-src-p -q &&
+        git checkout -q xbps-src-p &&
+        git fetch -q origin &&
         git rebase -q origin/master || exit $?
     fi
     ) || exit $?
