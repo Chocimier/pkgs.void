@@ -157,6 +157,10 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Returns different packages every day'''
 
     @abc.abstractmethod
+    def metapackages(self):
+        '''Returns names of packages that solely depend on other packages.'''
+
+    @abc.abstractmethod
     def newest(self, count):
         '''Finds names of _count_ most recently build packages'''
 
@@ -202,6 +206,10 @@ class SqliteDataSource(Datasource):
             unique(pkgname, date)
             )
             ''')
+        self._cursor.execute('''create table if not exists metapackages (
+            pkgname text unique not null
+            )
+            ''')
 
     def __enter__(self):
         return self
@@ -220,6 +228,7 @@ class SqliteDataSource(Datasource):
         )
         self._cursor.execute(query, package_row)
         self._add_daily_hashes(package_row, dates)
+        self._register_metapackage(package_row)
 
     def _add_daily_hashes(self, package_row, dates):
         if not dailyable(package_row):
@@ -237,6 +246,19 @@ class SqliteDataSource(Datasource):
                     hash_query,
                     (package_row.pkgname, date_as_string(date))
                 )
+
+    def _register_metapackage(self, package_row):
+        pkgname = package_row.pkgname
+        if (package_row.depends_count
+                and package_row.depends_count > 1
+                and not pkgname.endswith('-32bit')
+                and '"installed_size": 0' in package_row.repodata):
+            query = '''INSERT OR IGNORE INTO metapackages (pkgname)
+                VALUES (?)'''
+            self._cursor.execute(
+                query,
+                [pkgname]
+            )
 
     def read(self, **kwargs):
         '''Finds packages that match criteria passed as keyword arguments.'''
@@ -300,12 +322,10 @@ class SqliteDataSource(Datasource):
         return (x[0] for x in self._cursor.fetchall())
 
     def metapackages(self):
-        '''Finds names of _count_ most recently build packages'''
+        '''Returns names of packages that solely depend on other packages.'''
         query = (
-            'select distinct pkgname from packages '
-            'where depends_count > 1 '
-            "and not pkgname like '%-32bit' "
-            'and repodata like \'%"installed_size": 0%\' '
+            'select pkgname from metapackages '
+            'order by pkgname '
         )
         self._cursor.execute(query, [])
         return (x[0] for x in self._cursor.fetchall())
@@ -387,11 +407,6 @@ class SqliteDataSource(Datasource):
             on packages (
             mainpkg,
             pkgname
-            )
-            ''')
-        self._cursor.execute('''create index if not exists depends_count_idx
-            on packages (
-            depends_count
             )
             ''')
         self._cursor.execute('''create index if not exists popularity_idx
