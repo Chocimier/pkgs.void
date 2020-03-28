@@ -34,6 +34,7 @@ _PackageRow = namedtuple(
         'builddate',
         'repodata',
         'templatedata',
+        'mainpkg',
         'depends_count',
         'upstreamver',
         'repo',
@@ -54,11 +55,13 @@ class PackageRow(_PackageRow):
             builddate='',
             repodata=None,
             templatedata=None,
+            mainpkg='',
             depends_count=None,
             upstreamver='',
             popularity=0,
     ):
         # pylint: disable=too-many-arguments
+        # pylint: disable=too-many-locals
         # pylint: disable=unused-argument
         def to_jsondata(arg):
             if isinstance(arg, str):
@@ -137,6 +140,10 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Finds packages that match criteria passed as keyword arguments.'''
 
     @abc.abstractmethod
+    def same_template(self, pkgname):
+        '''Returns names of packages built from same template.'''
+
+    @abc.abstractmethod
     def list_all(self):
         '''Returns list of all packages.'''
 
@@ -183,6 +190,7 @@ class SqliteDataSource(Datasource):
             builddate text not null,
             repodata text not null,
             templatedata text not null,
+            mainpkg text not null,
             depends_count integer,
             upstreamver text not null,
             repo text not null,
@@ -239,6 +247,17 @@ class SqliteDataSource(Datasource):
         )
         self._cursor.execute(query, [kwargs[i] for i in fixed])
         return (PackageRow.from_record(x) for x in self._cursor.fetchall())
+
+    def same_template(self, pkgname):
+        '''Returns names of packages built from same template.'''
+        query = ('select distinct second.pkgname '
+                 'from packages as first '
+                 'join packages as second '
+                 'on first.mainpkg = second.mainpkg '
+                 'where first.pkgname = ? '
+                 'order by second.pkgname')
+        self._cursor.execute(query, [pkgname])
+        return (x[0] for x in self._cursor.fetchall())
 
     def list_all(self):
         '''Returns list of all packages.'''
@@ -361,6 +380,12 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create index if not exists builddate_idx
             on packages (
             builddate desc
+            )
+            ''')
+        self._cursor.execute('''create index if not exists mainpkg_idx
+            on packages (
+            mainpkg,
+            pkgname
             )
             ''')
         self._cursor.execute('''create index if not exists depends_count_idx

@@ -102,6 +102,7 @@ def build_db(source, repos):
                 arch='unknown-unknown',
                 restricted=dictionary['restricted'],
                 templatedata=template_json,
+                mainpkg=pkgname,
                 repo=''
             ), dates=[today, tomorrow])
         else:

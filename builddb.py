@@ -39,11 +39,13 @@ def build_db(source, repos):
                     v = v.decode()
                 dictionary[k] = v
             depends_count = len(dictionary.get('run_depends', []))
+            mainpkg = dictionary.get('source-revisions', pkgname).split(':')[0]
             source.create(datasource.PackageRow(
                 arch=arch,
                 pkgname=pkgname,
                 pkgver=dictionary['pkgver'],
                 repodata=dictionary,
+                mainpkg=mainpkg,
                 depends_count=depends_count,
                 repo=repo
             ), dates=[today, tomorrow])

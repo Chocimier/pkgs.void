@@ -176,7 +176,7 @@ def make_pkg(row):
     repo = separate_repository(row)
     if repo:
         pkg['repository'] = Repo(repo, row.restricted)
-    pkg['mainpkgname'] = pkg.get('source-revisions', row.pkgname).split(':')[0]
+    pkg['mainpkgname'] = row.mainpkg
     pkg['upstreamver'] = row.upstreamver
     if row.builddate:
         pkg['build-date'] = row.builddate
@@ -257,12 +257,14 @@ def data_generator(pkgname, repos):
     fields = combine_fields(fields_dic, binpkgs)
     separated = separate_fields(fields, SEPARATED_FIELDS)
     upstreamver = new_versions(binpkgs, separated['upstreamver'].value)
+    subpkgs = source.same_template(pkgname)
     return FoundPackages({
         'pkgname': pkgname,
         'short_desc': separated['short_desc'],
         'fields': fields,
         'versions': binpkgs,
         'mainpkg': {'pkgname': separated['mainpkgname']},
+        'subpkgs': list(subpkgs),
         'upstreamver': upstreamver,
     }, other_archs)
 

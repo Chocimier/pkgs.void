@@ -75,6 +75,14 @@
                  </div>
             </main>
         <aside>
+          <section py:if="len(subpkgs) > 1">
+            <h3>Packages built together:</h3>
+            <ul class="continuous">
+              <py:for each="subpkg in subpkgs">
+              <li><a href="${root_url}/package/${subpkg}">${subpkg}</a></li><!--!
+              --></py:for>
+            </ul>
+          </section>
             <py:for each="template in mainpkg.pkgname.value"><!--!
            --><a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template<!--!
             --><py:if test="len(mainpkg.pkgname.value) > 1"> (${template})</py:if><!--!
