@@ -24,16 +24,10 @@ from genshi.template import TemplateLoader
 
 from config import DEVEL_MODE, ROOT_URL, REPOS
 from voidhtml import (
-    lists_index, longest_names, metapackages,
+    lists_index, longest_names, main_page, metapackages,
     newest, of_day, page_generator, popular
 )
 from xbps import join_arch
-
-
-@route('')
-@route('/')
-def index():
-    redirect(ROOT_URL + '/newest')
 
 
 @route('/search')
@@ -47,6 +41,7 @@ def list_all_():
     return static_file('all.html', 'static/generated')
 
 
+route('/')(route('')(main_page))
 route('/toc')(lists_index)
 route('/of_day')(of_day)
 route('/newest')(newest)

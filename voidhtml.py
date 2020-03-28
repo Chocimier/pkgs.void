@@ -311,7 +311,7 @@ def of_day():
 
 def metapackages():
     source = datasource.factory()
-    packages = source.metapackages([Interest.INTERESTING, Interest.NOVEL])
+    packages = source.metapackages()
     parameters = {
         'title': 'Package sets',
         'packages': packages,
@@ -322,7 +322,7 @@ def metapackages():
 
 def newest():
     source = datasource.factory()
-    packages = source.newest(50)
+    packages = source.newest(70)
     parameters = {
         'title': 'Newest packages',
         'packages': packages,
@@ -340,9 +340,50 @@ def longest_names():
     return present.render_template('list.html', **parameters)
 
 
+def main_page():
+    source = datasource.factory()
+    lists = [
+        {
+            'title': 'Newest',
+            'more': 'More newest',
+            'address': 'newest',
+            'packages': source.newest(20)
+        },
+        {
+            'title': 'Popular',
+            'more': 'More popular',
+            'address': 'popular',
+            'packages': source.popular(20)
+        },
+        {
+            'title': 'Of day',
+            'more': 'More of day',
+            'address': 'of_day',
+            'packages': source.of_day(
+                datetime.datetime.now().date(),
+                half=True
+            ),
+        },
+        {
+            'title': 'Sets',
+            'more': 'More sets',
+            'address': 'sets',
+            'packages': source.metapackages([
+                Interest.INTERESTING,
+                Interest.NOVEL,
+            ])
+        },
+    ]
+    parameters = {
+        'title': 'Packages',
+        'lists': lists,
+    }
+    return present.render_template('main.html', **parameters)
+
+
 def popular():
     source = datasource.factory()
-    packages = source.popular(25)
+    packages = source.popular(70)
     parameters = {
         'title': 'Most popular packages',
         'subtitle': 'as reported by volunteers running PopCorn',
