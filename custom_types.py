@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import namedtuple
+from enum import Enum
 
 
 class Attributes:
@@ -67,6 +68,12 @@ Field = namedtuple('Field', ('name', 'title', 'value', 'presentation'))
 
 
 FoundPackages = namedtuple('FoundPackages', ('parameters', 'other'))
+
+
+class Interest(Enum):
+    INTERESTING = 'i'
+    BORING = 'b'
+    NOVEL = 'n'
 
 
 Repo = namedtuple('Repo', ('repo', 'reason'))

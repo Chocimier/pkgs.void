@@ -21,7 +21,7 @@ from itertools import chain
 
 import datasource
 import present
-from custom_types import Binpkgs, Field, FoundPackages, Repo, ValueAt
+from custom_types import Binpkgs, Field, FoundPackages, Interest, Repo, ValueAt
 from sink import same
 from xbps import split_arch, verrev_from_pkgver, version_from_verrev
 
@@ -311,7 +311,7 @@ def of_day():
 
 def metapackages():
     source = datasource.factory()
-    packages = source.metapackages()
+    packages = source.metapackages([Interest.INTERESTING, Interest.NOVEL])
     parameters = {
         'title': 'Package sets',
         'packages': packages,

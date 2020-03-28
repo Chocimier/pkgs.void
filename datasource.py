@@ -21,6 +21,7 @@ import sqlite3
 from collections import namedtuple
 
 import config
+from metadata import MetapackageInterest
 from xbps import pkgname_from_pkgver
 
 
@@ -157,8 +158,9 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Returns different packages every day'''
 
     @abc.abstractmethod
-    def metapackages(self):
-        '''Returns names of packages that solely depend on other packages.'''
+    def metapackages(self, allowed=None):
+        '''Returns names of packages that solely depend on other packages,
+        optionally limited to _allowed_ statuses.'''
 
     @abc.abstractmethod
     def newest(self, count):
@@ -184,6 +186,7 @@ class SqliteDataSource(Datasource):
         self._db = sqlite3.connect(path)
         self._cursor = self._db.cursor()
         self._initialize()
+        self.metadata_interest = MetapackageInterest()
 
     def _initialize(self):
         self._cursor.execute('''create table if not exists packages (
@@ -207,7 +210,8 @@ class SqliteDataSource(Datasource):
             )
             ''')
         self._cursor.execute('''create table if not exists metapackages (
-            pkgname text unique not null
+            pkgname text unique not null,
+            classification text not null
             )
             ''')
 
@@ -253,11 +257,12 @@ class SqliteDataSource(Datasource):
                 and package_row.depends_count > 1
                 and not pkgname.endswith('-32bit')
                 and '"installed_size": 0' in package_row.repodata):
-            query = '''INSERT OR IGNORE INTO metapackages (pkgname)
-                VALUES (?)'''
+            query = '''INSERT OR IGNORE INTO metapackages
+                (pkgname, classification)
+                VALUES (?, ?)'''
             self._cursor.execute(
                 query,
-                [pkgname]
+                [pkgname, self.metadata_interest.get(pkgname).value]
             )
 
     def read(self, **kwargs):
@@ -321,13 +326,20 @@ class SqliteDataSource(Datasource):
         self._cursor.execute(query, [date_as_string(date)])
         return (x[0] for x in self._cursor.fetchall())
 
-    def metapackages(self):
-        '''Returns names of packages that solely depend on other packages.'''
+    def metapackages(self, allowed=None):
+        '''Returns names of packages that solely depend on other packages,
+        optionally limited to _allowed_ statuses.'''
+        where = ''
+        if allowed:
+            where = 'where classification in ({})  '.format(
+                ', '.join('?'*len(allowed))
+            )
         query = (
             'select pkgname from metapackages '
-            'order by pkgname '
+            + where
+            + 'order by pkgname '
         )
-        self._cursor.execute(query, [])
+        self._cursor.execute(query, [i.value for i in (allowed or [])])
         return (x[0] for x in self._cursor.fetchall())
 
     def newest(self, count):
