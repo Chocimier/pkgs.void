@@ -284,6 +284,10 @@ def page_generator(pkgname, repos, single=False):
     return present.render_template('pkgs.void.html', **parameters)
 
 
+def _update_time(source):
+    return next(source.auxiliary('update_time')).replace('T', ' ', 1)
+
+
 def list_all():
     source = datasource.factory()
     packages = source.list_all()
@@ -323,8 +327,10 @@ def metapackages():
 def newest():
     source = datasource.factory()
     packages = source.newest(70)
+    updated = _update_time(source)
     parameters = {
         'title': 'Newest packages',
+        'subtitle': f'by {updated}',
         'packages': packages,
     }
     return present.render_template('list.html', **parameters)
@@ -376,6 +382,7 @@ def main_page():
     ]
     parameters = {
         'title': 'Packages',
+        'updated': _update_time(source),
         'lists': lists,
     }
     return present.render_template('main.html', **parameters)

@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import abc
+import datetime
 import hashlib
 import json
 import sqlite3
@@ -178,6 +179,10 @@ class Datasource(metaclass=abc.ABCMeta):
         at_most-th longest-name-bearing package'''
 
     @abc.abstractmethod
+    def auxiliary(self, key):
+        '''Returns auxiliary values of _key_.'''
+
+    @abc.abstractmethod
     def finish_creating(self):
         '''Creates indices after data is stored'''
 
@@ -216,6 +221,10 @@ class SqliteDataSource(Datasource):
             classification text not null
             )
             ''')
+        time = datetime.datetime.now().replace(microsecond=0).isoformat()
+        self._cursor.execute('''create table if not exists auxiliary
+            as select ? as key, ? as value
+            ''', ['update_time', time])
 
     def __enter__(self):
         return self
@@ -407,6 +416,15 @@ class SqliteDataSource(Datasource):
             'order by pkgname'
         )
         self._cursor.execute(query, [int(at_most)])
+        return (x[0] for x in self._cursor.fetchall())
+
+    def auxiliary(self, key):
+        '''Returns auxiliary values of _key_.'''
+        query = (
+            'select value from auxiliary '
+            'where key = ? '
+        )
+        self._cursor.execute(query, [key])
         return (x[0] for x in self._cursor.fetchall())
 
     def finish_creating(self):
