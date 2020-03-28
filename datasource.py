@@ -333,9 +333,10 @@ class SqliteDataSource(Datasource):
             '  select popularity from ('
             '    select distinct pkgname, popularity '
             '    from packages '
+            '    where popularity > 0 '
+            '    order by popularity desc'
+            '    limit 1 offset ?'
             '  )'
-            '  order by popularity desc'
-            '  limit 1 offset ?'
             ')'
             'order by popularity desc'
         )
