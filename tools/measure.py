@@ -33,8 +33,13 @@ _TIMEIT = 'timeit'
 
 
 _CODE_MAP = {
-    "gcc" : "voidhtml.page_generator('gcc', REPOS)",
+    "gcc": "voidhtml.page_generator('gcc', REPOS)",
+    "main": "voidhtml.main_page()",
     "newest": "voidhtml.newest()",
+    "of_day": "voidhtml.of_day()",
+    "popular": "voidhtml.popular()",
+    "sets": "voidhtml.metapackages()",
+    "longest": "voidhtml.longest_names()",
 }
 
 
