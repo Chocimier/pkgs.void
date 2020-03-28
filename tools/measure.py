@@ -32,8 +32,10 @@ _PROFILE = 'profile'
 _TIMEIT = 'timeit'
 
 
-_GCC = 'gcc'
-_NEWEST = 'newest'
+_CODE_MAP = {
+    "gcc" : "voidhtml.page_generator('gcc', REPOS)",
+    "newest": "voidhtml.newest()",
+}
 
 
 def is_func(constant, variable):
@@ -54,11 +56,16 @@ def _timeit_run(name, code):
     print(f'{name}: {time}s')
 
 
+def _code(func):
+    return _CODE_MAP.get(func)
+
+
 def _timeit(func):
-    if is_func(_GCC, func):
-        _timeit_run(_GCC, "voidhtml.page_generator('gcc', REPOS)")
-    if is_func(_NEWEST, func):
-        _timeit_run(_NEWEST, "voidhtml.newest()")
+    if func:
+        _timeit_run(func, _code(func))
+        return
+    for real_func in _CODE_MAP:
+        _timeit_run(real_func, _code(real_func))
 
 
 def _profile_run(code):
@@ -73,10 +80,9 @@ def _profile_run(code):
 
 
 def _profile(func):
-    if func == _GCC:
-        _profile_run("voidhtml.page_generator('gcc', REPOS)")
-    elif func == _NEWEST:
-        _profile_run("voidhtml.newest()")
+    code = _code(func)
+    if code:
+        _profile_run(code)
     else:
         print('pass func name', file=sys.stderr)
         sys.exit(1)
@@ -91,7 +97,7 @@ def main(mode=None, func=None):
 
 
 def usage(status):
-    funcs = f'{_GCC}|{_NEWEST}'
+    funcs = '|'.join(_CODE_MAP.keys())
     print(
         sys.argv[0] + f' {_TIMEIT} [{funcs}]\n' +
         sys.argv[0] + f' {_PROFILE} {funcs}'
