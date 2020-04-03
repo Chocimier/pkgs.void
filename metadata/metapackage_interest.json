@@ -45,6 +45,7 @@
         "python-iwlib",
         "python-jupyter",
         "python3-jupyter",
+        "qt5",
         "qtcreator-full",
         "readline",
         "schilytools",
