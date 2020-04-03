@@ -1,4 +1,4 @@
-DAILY_HASH_BITS = 8
+DAILY_HASH_BITS = 9
 
 DATASOURCE_CLASS = 'SqliteDataSource'
 

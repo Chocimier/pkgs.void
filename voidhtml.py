@@ -365,13 +365,9 @@ def main_page():
         },
         {
             'title': 'Of day',
-            'more': 'More of day',
             'bullets': True,
             'address': 'of_day',
-            'packages': source.of_day(
-                datetime.datetime.now().date(),
-                half=True
-            ),
+            'packages': source.of_day(datetime.datetime.now().date()),
         },
         {
             'title': 'Sets',

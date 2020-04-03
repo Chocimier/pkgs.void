@@ -105,7 +105,7 @@ def dailyable(package_row):
 
 
 def daily_hash(pkgname, date, bits=None):
-    '''We want to select small (around 50) subset of packages
+    '''We want to select small (around 20) subset of packages
     with following properties:
     - changing daily
     - not partitioning: every pair of packages has chance to be chosen some day
@@ -155,9 +155,8 @@ class Datasource(metaclass=abc.ABCMeta):
         and sets values passed as keyword arguments prefixed with 'set_'.'''
 
     @abc.abstractmethod
-    def of_day(self, date, half=False):
-        '''Returns different packages every day.
-        If _half_ is true, returns half of them.'''
+    def of_day(self, date):
+        '''Returns different packages every day.'''
 
     @abc.abstractmethod
     def metapackages(self, allowed=None):
@@ -212,7 +211,6 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create table if not exists daily_hash (
             pkgname text not null,
             date text not null,
-            half integer not null,
             unique(pkgname, date)
             )
             ''')
@@ -248,22 +246,18 @@ class SqliteDataSource(Datasource):
     def _add_daily_hashes(self, package_row, dates):
         if not dailyable(package_row):
             return
-        hash_query = '''INSERT OR IGNORE INTO daily_hash
-            (pkgname, date, half) VALUES (?, ?, ?)'''
+        hash_query = '''INSERT OR IGNORE INTO daily_hash (pkgname, date)
+            VALUES (?, ?)'''
         for date in dates:
             hash_value = daily_hash(
                 package_row.pkgname,
                 date,
-                config.DAILY_HASH_BITS + 1
+                config.DAILY_HASH_BITS
             )
-            if daily_hash('', date).startswith(hash_value[:-1]):
+            if daily_hash('', date).startswith(hash_value):
                 self._cursor.execute(
                     hash_query,
-                    (
-                        package_row.pkgname,
-                        date_as_string(date),
-                        int(hash_value[-1])
-                    )
+                    (package_row.pkgname, date_as_string(date))
                 )
 
     def _register_metapackage(self, package_row):
@@ -331,15 +325,11 @@ class SqliteDataSource(Datasource):
         )
         self._cursor.execute(query, [kwargs[i] for i in updated + fixed])
 
-    def of_day(self, date, half=False):
+    def of_day(self, date):
         '''Returns different packages every day'''
-        where_half = ''
-        if half:
-            where_half = 'and half = 1 '
         query = (
             'select pkgname from daily_hash '
             + 'where date = ?'
-            + where_half
             + 'order by pkgname'
         )
         self._cursor.execute(query, [date_as_string(date)])
@@ -456,8 +446,7 @@ class SqliteDataSource(Datasource):
             ''')
         self._cursor.execute('''create index if not exists daily_hash_idx
             on daily_hash (
-            date,
-            half
+            date
             )
             ''')
 

@@ -23,7 +23,7 @@
                         </li>
                     </ol><!--!
                     --></py:choose>
-                    <a href="${root_url}/${entry.address}">${entry.more}</a>
+                    <a py:if="'more' in entry" href="${root_url}/${entry.address}">${entry.more}</a>
                 </div>
     </py:def>
     <div class="content">
