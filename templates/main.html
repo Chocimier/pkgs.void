@@ -11,11 +11,18 @@
     <py:def function="list(entry)">
                 <div class="non-breakable">
                     <h2>${entry.title}</h2>
-                    <ol>
+                    <py:choose test="'bullets' in entry and entry.bullets"><!--!
+                    --><ul py:when="True">
                         <li py:for="i in entry.packages">
                             <a href="${root_url}/package/${i}">${i}</a>
                         </li>
-                    </ol>
+                    </ul><!--!
+                    --><ol py:otherwise="">
+                        <li py:for="i in entry.packages">
+                            <a href="${root_url}/package/${i}">${i}</a>
+                        </li>
+                    </ol><!--!
+                    --></py:choose>
                     <a href="${root_url}/${entry.address}">${entry.more}</a>
                 </div>
     </py:def>

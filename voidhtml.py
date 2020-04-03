@@ -309,6 +309,7 @@ def of_day():
     parameters = {
         'title': 'Packages of the day',
         'packages': packages,
+        'bullets': True,
     }
     return present.render_template('list.html', **parameters)
 
@@ -318,6 +319,7 @@ def metapackages():
     packages = source.metapackages()
     parameters = {
         'title': 'Package sets',
+        'bullets': True,
         'packages': packages,
         'with_devel_and_so': True,
     }
@@ -364,6 +366,7 @@ def main_page():
         {
             'title': 'Of day',
             'more': 'More of day',
+            'bullets': True,
             'address': 'of_day',
             'packages': source.of_day(
                 datetime.datetime.now().date(),
@@ -373,6 +376,7 @@ def main_page():
         {
             'title': 'Sets',
             'more': 'More sets',
+            'bullets': True,
             'address': 'sets',
             'packages': source.metapackages([
                 Interest.INTERESTING,

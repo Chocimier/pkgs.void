@@ -11,12 +11,19 @@
     <div class="content">
         <main>
             <h1>${title}</h1>
-            <em py:if="defined('subtitle')">${subtitle}</em>
-            <ol>
+            <em py:if="defined('subtitle')">${subtitle}</em><!--!
+            --><py:choose test=""><!--!
+            --><ul py:when="value_of('bullets', False)">
                 <li py:for="i in packages">
                     <a href="${root_url}/package/${i}">${i}</a>
                 </li>
-            </ol>
+            </ul><!--!
+            --><ol py:otherwise="">
+                <li py:for="i in packages">
+                    <a href="${root_url}/package/${i}">${i}</a>
+                </li>
+            </ol><!--!
+            --></py:choose>
             <footer py:if="not defined('with_devel_and_so') or not with_devel_and_so"
             >List excludes devel, debug and multilib packages.</footer>
         </main>
