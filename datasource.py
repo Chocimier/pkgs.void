@@ -22,6 +22,7 @@ import sqlite3
 from collections import namedtuple
 
 import config
+from custom_types import Interest
 from metadata import MetapackageInterest
 from xbps import pkgname_from_pkgver
 
@@ -344,12 +345,15 @@ class SqliteDataSource(Datasource):
                 ', '.join('?'*len(allowed))
             )
         query = (
-            'select pkgname from metapackages '
+            'select pkgname, classification from metapackages '
             + where
             + 'order by pkgname '
         )
         self._cursor.execute(query, [i.value for i in (allowed or [])])
-        return (x[0] for x in self._cursor.fetchall())
+        return (
+            {'pkgname': x[0], 'classification': Interest(x[1])}
+            for x in self._cursor.fetchall()
+        )
 
     def newest(self, count):
         '''Finds names of _count_ most recently build packages'''

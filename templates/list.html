@@ -7,25 +7,26 @@
 <head>
     <title>${title} from void</title>
 </head>
-<body>
-    <div class="content">
+<body><!--!
+--><py:def function="list_items()">
+                <li py:for="i in packages" py:with="featured = getattr(i, 'featured', False)">
+                    <strong py:strip="not featured"><a href="${root_url}/package/${i}">${i}</a><py:if test="featured"> *</py:if></strong>
+                </li>
+</py:def><!--!
+    --><div class="content">
         <main>
             <h1>${title}</h1>
             <em py:if="defined('subtitle')">${subtitle}</em><!--!
             --><py:choose test=""><!--!
-            --><ul py:when="value_of('bullets', False)">
-                <li py:for="i in packages">
-                    <a href="${root_url}/package/${i}">${i}</a>
-                </li>
+            --><ul py:when="value_of('bullets', False)"> ${list_items()}
             </ul><!--!
-            --><ol py:otherwise="">
-                <li py:for="i in packages">
-                    <a href="${root_url}/package/${i}">${i}</a>
-                </li>
+            --><ol py:otherwise=""> ${list_items()}
             </ol><!--!
             --></py:choose>
-            <footer py:if="not defined('with_devel_and_so') or not with_devel_and_so"
-            >List excludes devel, debug and multilib packages.</footer>
+            <footer py:if="value_of('has_featured') or not value_of('with_devel_and_so')">
+              <p py:if="value_of('has_featured')">Items marked with * do not appear on main page.</p>
+              <p py:if="not value_of('with_devel_and_so')">List excludes devel, debug and multilib packages.</p>
+            </footer>
         </main>
     </div>
     <footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>

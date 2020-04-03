@@ -314,14 +314,25 @@ def of_day():
     return present.render_template('list.html', **parameters)
 
 
+class Collection:
+    def __init__(self, dictionary):
+        self._pkgname = dictionary['pkgname']
+        interest = Interest(dictionary['classification'])
+        self.featured = (interest == Interest.BORING)
+
+    def __str__(self):
+        return self._pkgname
+
+
 def metapackages():
     source = datasource.factory()
-    packages = source.metapackages()
+    packages = [Collection(i) for i in source.metapackages()]
     parameters = {
         'title': 'Package sets',
         'bullets': True,
         'packages': packages,
         'with_devel_and_so': True,
+        'has_featured': any([i.featured for i in packages]),
     }
     return present.render_template('list.html', **parameters)
 
@@ -374,10 +385,10 @@ def main_page():
             'more': 'More sets',
             'bullets': True,
             'address': 'sets',
-            'packages': source.metapackages([
+            'packages': [i['pkgname'] for i in source.metapackages([
                 Interest.INTERESTING,
                 Interest.NOVEL,
-            ])
+            ])]
         },
     ]
     parameters = {
