@@ -17,14 +17,15 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from datetime import datetime, timedelta
+from datetime import timedelta
+from sink import now
 
 import datasource
 from repopaths import index_path, load_repo
 
 
 def build_db(source, repos):
-    today = datetime.now().date()
+    today = now().date()
     tomorrow = today + timedelta(days=1)
     for repo in repos:
         path = index_path(repo)

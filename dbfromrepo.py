@@ -20,9 +20,10 @@ import os
 import subprocess
 import sys
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 import datasource
+from sink import now
 
 
 DISTDIR = os.environ['XBPS_DISTDIR']
@@ -71,7 +72,7 @@ def templatedata(pkgname, arch):
 
 
 def build_db(source, repos):
-    today = datetime.now().date()
+    today = now().date()
     tomorrow = today + timedelta(days=1)
     srcpkgs = os.path.join(DISTDIR, 'srcpkgs')
     for pkgname in os.listdir(srcpkgs):

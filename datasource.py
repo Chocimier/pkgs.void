@@ -22,6 +22,7 @@ import sqlite3
 from collections import namedtuple
 
 import config
+import sink
 from custom_types import Interest
 from metadata import MetapackageInterest
 from xbps import pkgname_from_pkgver
@@ -93,7 +94,15 @@ def from_json(text):
     return json.loads(text)
 
 
-def date_as_string(date):
+def datetime_to_string(datetime_obj):
+    return datetime_obj.isoformat()
+
+
+def datetime_from_string(string):
+    return datetime.datetime.fromisoformat(string)
+
+
+def _date_as_string(date):
     return date.strftime('%Y-%m-%d')
 
 
@@ -117,7 +126,7 @@ def daily_hash(pkgname, date, bits=None):
     Then package is chosen when such hash has common prefix with hash of date.
     Lenght of prefix in bits is adjusted such that set has required size.
     '''
-    string = pkgname + date_as_string(date)
+    string = pkgname + _date_as_string(date)
     hash_value = hashlib.md5(string.encode()).digest()
     integer = int.from_bytes(hash_value, 'big')
     binary = "{num:0{width}b}".format(num=integer, width=8*len(hash_value))
@@ -220,7 +229,7 @@ class SqliteDataSource(Datasource):
             classification text not null
             )
             ''')
-        time = datetime.datetime.now().replace(microsecond=0).isoformat()
+        time = datetime_to_string(sink.now().replace(microsecond=0))
         self._cursor.execute('''create table if not exists auxiliary
             as select ? as key, ? as value
             ''', ['update_time', time])
@@ -258,7 +267,7 @@ class SqliteDataSource(Datasource):
             if daily_hash('', date).startswith(hash_value):
                 self._cursor.execute(
                     hash_query,
-                    (package_row.pkgname, date_as_string(date))
+                    (package_row.pkgname, _date_as_string(date))
                 )
 
     def _register_metapackage(self, package_row):
@@ -333,7 +342,7 @@ class SqliteDataSource(Datasource):
             + 'where date = ?'
             + 'order by pkgname'
         )
-        self._cursor.execute(query, [date_as_string(date)])
+        self._cursor.execute(query, [_date_as_string(date)])
         return (x[0] for x in self._cursor.fetchall())
 
     def metapackages(self, allowed=None):

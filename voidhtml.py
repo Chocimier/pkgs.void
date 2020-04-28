@@ -14,15 +14,16 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import datetime
 import sys
 from collections import Counter, OrderedDict, defaultdict
 from itertools import chain
 
+import humanize
+
 import datasource
 import present
 from custom_types import Binpkgs, Field, FoundPackages, Interest, Repo, ValueAt
-from sink import same
+from sink import same, now
 from xbps import split_arch, verrev_from_pkgver, version_from_verrev
 
 
@@ -285,7 +286,16 @@ def page_generator(pkgname, repos, single=False):
 
 
 def _update_time(source):
-    return next(source.auxiliary('update_time')).replace('T', ' ', 1)
+    return datasource.datetime_from_string(
+        next(source.auxiliary('update_time'))
+    )
+
+
+def _ago(source):
+    updated = _update_time(source)
+    ago = humanize.naturaltime(now() - updated)
+    updated_no_zone = updated.strftime('%Y-%m-%d %H:%M:%S')
+    return f'{updated_no_zone} UTC ({ago})'
 
 
 def list_all():
@@ -305,7 +315,7 @@ def list_all():
 
 def of_day():
     source = datasource.factory()
-    packages = source.of_day(datetime.datetime.now().date())
+    packages = source.of_day(now().date())
     parameters = {
         'title': 'Packages of the day',
         'packages': packages,
@@ -340,10 +350,9 @@ def metapackages():
 def newest():
     source = datasource.factory()
     packages = source.newest(70)
-    updated = _update_time(source)
     parameters = {
         'title': 'Newest packages',
-        'subtitle': f'by {updated}',
+        'subtitle': f'by {_ago(source)}',
         'packages': packages,
     }
     return present.render_template('list.html', **parameters)
@@ -378,7 +387,7 @@ def main_page():
             'title': 'Of day',
             'bullets': True,
             'address': 'of_day',
-            'packages': source.of_day(datetime.datetime.now().date()),
+            'packages': source.of_day(now().date()),
         },
         {
             'title': 'Sets',
@@ -393,7 +402,7 @@ def main_page():
     ]
     parameters = {
         'title': 'Packages',
-        'updated': _update_time(source),
+        'updated': _ago(source),
         'lists': lists,
     }
     return present.render_template('main.html', **parameters)

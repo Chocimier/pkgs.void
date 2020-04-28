@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+
+import datetime
+
 import config
 
 
@@ -25,3 +28,7 @@ def web_parameters():
     return {
         'root_url': config.ROOT_URL,
     }
+
+
+def now():
+    return datetime.datetime.now(datetime.timezone.utc)
