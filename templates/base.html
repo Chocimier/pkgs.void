@@ -1,19 +1,19 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      py:strip="">
-<py:match path="head" once="true">
-    <head py:attrs="select('@*')">
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+
+
+
+
+    <head>
         <meta charset="utf-8"/>
-        <title py:with="title = list(select('title/text()'))" py:choose=""><!--!
-         --><py:when test="title">${title}</py:when><!--!
-         --><py:otherwise>Packages from Void</py:otherwise><!--!
-     --></title>
+        <title>${_context.get('title', 'Packages')} from Void</title>
         <link href="${root_url}/static/style.css" rel="stylesheet" type="text/css"/>
-        ${select('*[local-name()!="title"]')}
+        
     </head>
-</py:match>
-<py:match path="body" once="true">
-    <body py:attrs="select('@*')">
+
+
+    <body>
         <header>
             <nav>
                 <ul class="horizontal">
@@ -28,7 +28,6 @@
                 <input type="submit" value="View"/>
             </form>
         </header>
-        ${select('*')}
-
-    </body></py:match>
+{== _content ==}
+    </body>
 </html>

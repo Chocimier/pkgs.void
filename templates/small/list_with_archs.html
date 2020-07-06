@@ -1,0 +1,4 @@
+<?py bullet_list = (len(param.value) == 1) ?>
+<?py echo(iff(not bullet_list, '<ul>', '')) ?>
+<?py for idx, value in enumerate(param.value): ?><?py masks = masks_presenter(value.coords, param.presentation['space']) ?>{== iff(not bullet_list and idx > 0, '</li>') ==}{== '<li>' if not bullet_list else iff(masks, '<span class="masked">') ==}${ param.presentation['formatter'](value.value)}{== iff(masks, f'<aside> [{to_escaped(masks)}]</aside>') ==}{== iff(not bullet_list, '\n') ==}{== iff(masks and bullet_list, '</span>') ==}<?py #endfor ?>
+{== iff(not bullet_list, '</li></ul>') ==}

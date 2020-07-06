@@ -1,23 +1,12 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      lang="en">
-<xi:include href="base.html"/>
-<head>
-    <title>All packages from void</title>
-</head>
-<body>
+<?py _context['title'] = 'All packages' ?>
     <div class="content">
         <main>
             <h1>All packages</h1>
             <dl>
-                <py:for each="i in packages">
-                <dt><a href="${root_url}/package/${i.pkgname}">${i.pkgname}</a></dt>
-                <dd>${i.short_desc}</dd>
-                </py:for>
+                <?py for i in packages: ?>
+                <dt><a href="${root_url}/package/${i['pkgname']}">${i['pkgname']}</a></dt>
+                <dd>${i['short_desc']}</dd>
+                <?py #endfor ?>
             </dl>
         </main>
     </div>
-</body>
-</html>

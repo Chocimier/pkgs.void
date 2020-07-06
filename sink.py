@@ -20,6 +20,10 @@ import datetime
 import config
 
 
+def iff(condition, truthy, falsy=None):
+    return truthy if condition else falsy
+
+
 def same(arg):
     return arg
 

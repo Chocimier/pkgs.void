@@ -1,95 +1,93 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      lang="en">
-<xi:include href="base.html"/>
-<head>
-  <title>${pkgname} from Void</title>
-  <py:def function="minmax(field)"><!--!
- --><py:with vars="min=field.presentation.formatter(field.value.min); max=field.presentation.formatter(field.value.max)"><!--!
-   --><py:choose test="min"><!--!
-     --><py:when test="max">${min}</py:when><!--!
-     --><py:otherwise>${min} - ${max}</py:otherwise><!--!
-   --></py:choose><!--!
- --></py:with><!--!
---></py:def>
-  <py:def function="list_with_archs(param)"><!--!
-   --><ul py:with="bullet_list = (len(param.value) == 1)" py:strip="bullet_list"><!--!
-     --><li py:for="value in param.value"
-            py:with="masks = masks_presenter(value.coords, param.presentation.space)"
-            py:strip="bullet_list"
-          ><span class="masked"
-              py:strip="not masks or not bullet_list"
-            >${param.presentation.formatter(value.value)}<!--!
-         --><aside py:if="masks"> [${masks}]</aside><py:if test="not bullet_list">
-</py:if></span></li><!--!
-   --></ul><!--!
---></py:def>
-</head>
-<body>
-    <div class="content">
+<?py _context['title']=pkgname ?>
+        <div class="content">
         <main>
             <div class="column">
                  <h2>${pkgname}</h2>
-                 <p>${list_with_archs(short_desc)}
-</p>
-                 <py:if test="single_pkg">
+				 <?py _context['param'] = short_desc ?>
+                 <p><?py include('small/list_with_archs.html') ?></p>
+                 
+                 <?py if single_pkg: ?>
                      <hr/>
-                     <p py:with="version=next(next(versions.by_iset).by_libc)">Build for ${version.data.iset}-${version.data.libc}, version
+					 <?py version=next(next(versions.by_iset).by_libc) ?>
+                     <p>Build for ${version.data['iset']}-${version.data['libc']}, version
                      <strong>${version.version}<span class="revision"><span class="revision-separator">_</span>${version.revision}</span></strong>.
                      <a href="${root_url}/package/${pkgname}">Builds for all architectures</a>.</p>
                      <hr/>
-                 </py:if>
-                 <table py:if="not single_pkg">
+                 
+                 
+                 <?py else: ?>
+                 <table>
                    <thead>
                      <tr>
                        <td/>
-                       <py:for each="libc in versions.by_libc">
-                       <th scope="col" >${libc.libc}</th>
-                       </py:for>
+                       <?py for libc in versions.by_libc: ?>
+                       
+                       <th scope="col">${libc.libc}</th>
+                       <?py #endfor ?>
+                       
                      </tr>
                    </thead>
                    <tbody>
-                     <tr py:for="iset in versions.by_iset">
+                     <?py for idx, iset in enumerate(versions.by_iset): ?>
+{== iff(idx == 0, '                     ') ==}<tr>
                        <th scope="row">${iset.iset}</th>
-                       <py:for each="version in iset.by_libc">
-                       <td><a py:if="version" href="${root_url}/package/${pkgname}/${version.data.iset}-${version.data.libc}"
-                       >${version.version}<sub>_${version.revision}</sub></a></td>
-                       </py:for>
-                     </tr>
+                       
+                       <?py for version in iset.by_libc: ?>
+						   <?py if version: ?>
+                       <td><a href="${root_url}/package/${pkgname}/${version.data['iset']}-${version.data['libc']}">${version.version}<sub>_${version.revision}</sub></a></td>
+						   <?py else: ?>
+                       <td/>
+						   <?py #endif ?>
+                       
+                       <?py #endfor ?>
+                     </tr><?py #endfor ?>
+
                    </tbody>
                  </table>
-                 <p xmlns:py="http://genshi.edgewall.org/" py:if="upstreamver">We know that authors released version<py:for each="version in upstreamver"> ${version}</py:for>. Please give maintainer some time to update.</p>
-                 <dl py:if="fields">
-                 <py:for each="field in fields">
+				 <?py #endif ?>
+				 <?py if upstreamver: ?>
+                 <p>We know that authors released version<py:for each="version in upstreamver"> ${version}</py:for>. Please give maintainer some time to update.</p>
+				 <?py #endif ?>
+				 <?py if fields: ?>
+                 
+                 <dl>
+                 
+				 <?py for field in fields: ?>
                      <dt>${field.title}:</dt>
-                     <dd><!--!
-                    --><py:choose test="field.presentation.presenter"><!--!
-                      --><py:when test="None">${list_with_archs(field)}</py:when><!--!
-                      --><py:when test="'minmax'">${minmax(field)}</py:when><!--!
-                      --><py:otherwise>${field.value}</py:otherwise><!--!
-                    --></py:choose>
+                     <dd><?py presenter=field.presentation['presenter'] ?>
+					 <?py if presenter is None: ?>
+					 <?py _context['param'] = field ?>
+					 <?py include('small/list_with_archs.html') ?>
+					 <?py elif presenter == 'minmax': ?>
+					  <?py include('small/minmax.html', field=field) ?>
+                     <?py else: ?>
+					  ${field.value}
+                     <?py #endif ?>
 </dd>
-</py:for>
+
+				 <?py #endfor ?>
                  </dl>
+				 <?py #endif ?>
                  </div>
             </main>
         <aside>
-          <section py:if="len(subpkgs) > 1">
+		  <?py if len(subpkgs) > 1: ?>
+          <section>
             <h3>Packages built together:</h3>
             <ul class="continuous">
-              <py:for each="subpkg in subpkgs">
-              <li><a href="${root_url}/package/${subpkg}">${subpkg}</a></li><!--!
-              --></py:for>
+              
+			  <?py for subpkg in subpkgs: ?>
+              <li><a href="${root_url}/package/${subpkg}">${subpkg}</a></li>
+			  <?py #endfor ?>
             </ul>
           </section>
-            <py:for each="template in sorted(mainpkg.pkgname.value)"><!--!
-           --><a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template<!--!
-            --><py:if test="len(mainpkg.pkgname.value) > 1"> (${template})</py:if><!--!
-            --></a><!--!
-        --></py:for>
+		  <?py else: ?>
+          
+		  <?py #endif ?>
+          <?py echo('            ') ?>
+          <?py for template in sorted(mainpkg['pkgname'].value): ?>
+<a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template${f' ({template})' if len(mainpkg['pkgname'].value) > 1 else ''}</a><?py
+		#endfor ?>
+
         </aside>
     </div>
-</body>
-</html>

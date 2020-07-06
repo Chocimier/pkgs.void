@@ -1,0 +1,17 @@
+                <div class="non-breakable">
+                    <h2>${entry['title']}</h2>
+                    <?py tag = 'ul' if entry.get('bullets') else 'ol' ?>
+                    <{== tag ==}>
+                    <?py echo('                        ') ?>
+                        <?py for i in entry['packages']: ?>
+<li>
+                            <a href="${root_url}/package/${i}">${i}</a>
+                        </li><?py
+                        #endfor ?>
+
+                    </{== tag ==}>
+                    <?py if 'more' in entry: ?>
+                    <a href="${root_url}/${entry['address']}">${entry['more']}</a>
+                    <?py #endif ?>
+                </div>
+    

@@ -1,39 +1,12 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      lang="en">
-<xi:include href="base.html"/>
-<head>
-    <title>${title} from void</title>
-</head>
-<body>
-    <py:def function="list(entry)">
-                <div class="non-breakable">
-                    <h2>${entry.title}</h2>
-                    <py:choose test="'bullets' in entry and entry.bullets"><!--!
-                    --><ul py:when="True">
-                        <li py:for="i in entry.packages">
-                            <a href="${root_url}/package/${i}">${i}</a>
-                        </li>
-                    </ul><!--!
-                    --><ol py:otherwise="">
-                        <li py:for="i in entry.packages">
-                            <a href="${root_url}/package/${i}">${i}</a>
-                        </li>
-                    </ol><!--!
-                    --></py:choose>
-                    <a py:if="'more' in entry" href="${root_url}/${entry.address}">${entry.more}</a>
-                </div>
-    </py:def>
-    <div class="content">
+<?py _context['title'] = title ?>
+        <div class="content">
         <main>
             <div class="breakable">
-                 <py:for each="entry in lists">${list(entry)}</py:for>
+                 
+                <?py for entry in lists: ?>
+<?py include('small/main_list.html', entry=entry) ?>
+                <?py #endfor ?>
             </div>
             <p>Site was updated at ${updated}.</p>
         </main>
-    </div>
-    <footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>
-</body>
-</html>
+    </div><footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>

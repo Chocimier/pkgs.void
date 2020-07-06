@@ -1,0 +1,6 @@
+<?py min=field.presentation['formatter'](field.value['min']); max=field.presentation['formatter'](field.value['max']) ?>
+<?py if min == max: ?>
+${min}
+<?py else: ?>
+${min} - ${max}
+<?py #endif ?>

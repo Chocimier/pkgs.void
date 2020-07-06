@@ -16,31 +16,55 @@
 
 from collections import Counter, namedtuple
 
-from genshi.builder import Element
-from genshi.output import XMLSerializer
-from genshi.template import TemplateLoader
-from genshi.template.markup import Markup
+# pylint can't import modules from create_module, so import-error
+# some functions are used only in templates, so unused-import
+# above makes lines too long, so noqa
+import tenjin.helpers  # pylint: disable=import-error
 from humanize import naturalsize
+from tenjin import MemoryCacheStorage, SafeEngine
+from tenjin.escaped import as_escaped, to_escaped  # noqa, pylint: disable=import-error
+from tenjin.helpers import echo, to_str  # noqa, pylint: disable=unused-import,import-error
 
 from custom_types import ValueAt
-from sink import web_parameters
+from sink import iff, web_parameters  # noqa, pylint: disable=unused-import
 from config import DEVEL_MODE, ROOT_URL
 
 
-_CACHED_LOADER = TemplateLoader('templates')
+_CACHED_LOADER = None
 
 
 Area = namedtuple('Area', ('value', 'coords'))
 
 
+def escape(arg):
+    return (
+        arg
+        .replace('&', '&amp;')
+        .replace('<', '&lt;')
+        .replace('>', '&gt;')
+    )
+
+
+def escape_attr(arg):
+    return (
+        arg
+        .replace('&', '&amp;')
+        .replace('"', '&quot;')
+        .replace("'", '&apos;')
+    )
+
+
+tenjin.helpers.escape = escape
+
+
 def _loader():
-    if DEVEL_MODE:
-        return TemplateLoader('templates')
+    global _CACHED_LOADER  # pylint: disable=global-statement
+    if DEVEL_MODE or _CACHED_LOADER is None:
+        _CACHED_LOADER = SafeEngine(
+            path=['templates'],
+            cache=MemoryCacheStorage()
+        )
     return _CACHED_LOADER
-
-
-def _serializer(**kwargs):
-    return XMLSerializer(strip_whitespace=False, **kwargs)
 
 
 def parse_contact(value):
@@ -48,7 +72,8 @@ def parse_contact(value):
 
 
 def render_link(href, text):
-    return Element('a', href=href)(text)
+    code = '<a href="{}">{}</a>'
+    return as_escaped(code.format(escape_attr(href), escape(text)))
 
 
 def _masks_as_string(masks_set):
@@ -60,18 +85,25 @@ def _masks_presenter(values, space):
     return _masks_as_string(masks_set)
 
 
-def render_template(template_path, **kwargs):
-    template = _loader().load(template_path)
-    template.serializer = _serializer
-    return Markup(template.generate(
-        masks_presenter=_masks_presenter,
+SNIPPET = object()
+
+
+def render_template(template_path, template_mode=None, **kwargs):
+    context = {
+        'masks_presenter': _masks_presenter,
         **web_parameters(),
         **kwargs
-    ))
+    }
+    if template_mode is SNIPPET:
+        return as_escaped(_loader().render(template_path, context))
+    return _loader().render(template_path, context, layout='base.html')
 
 
 def as_new_version(versions):
-    return render_template('small/as_new_version.html', versions=versions)
+    return render_template(
+        'small/as_new_version.html',
+        SNIPPET, versions=versions
+    )
 
 
 def as_package(value):
@@ -106,8 +138,13 @@ def as_package(value):
             pkgver = pkgver[1:]
         if version:
             pairs.append((version, revision))
-        pkgver = render_template('small/as_package.html', pairs=pairs)
-    return render_link(href, pkgname) + pkgver
+        pkgver = render_template('small/as_package.html', SNIPPET, pairs=pairs)
+    else:
+        pkgver = to_escaped(pkgver)
+    return as_escaped(
+        render_link(href, pkgname)
+        + as_escaped(pkgver.rstrip('\n'))
+    )
 
 
 def as_link(value):
@@ -126,6 +163,7 @@ def as_repository(value):
     name = 'restricted' if value.repo == 'restricted' else 'additional'
     return render_template(
         f'present/repository/{name}.html',
+        SNIPPET,
         **value._asdict()
     )
 

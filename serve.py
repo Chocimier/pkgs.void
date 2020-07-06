@@ -20,12 +20,11 @@ import sys
 
 from bottle import ServerAdapter, default_app, error, redirect
 from bottle import request, route, run, server_names, static_file
-from genshi.template import TemplateLoader
 
 from config import DEVEL_MODE, ROOT_URL, REPOS
 from voidhtml import (
     lists_index, longest_names, main_page, metapackages,
-    newest, of_day, page_generator, popular
+    newest, of_day, page_generator, popular, which_package
 )
 from xbps import join_arch
 
@@ -48,17 +47,7 @@ route('/newest')(newest)
 route('/sets')(metapackages)
 route('/popular')(popular)
 route('/longest_names')(longest_names)
-
-
-@route('/package')
-def no_package():
-    loader = TemplateLoader('.')
-    return (
-        loader
-        .load('templates/which.html')
-        .generate(root_url=ROOT_URL)
-        .render('html')
-    )
+route('/package')(which_package)
 
 
 @route('/package/<pkgname>')

@@ -1,21 +1,16 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      lang="en">
-<xi:include href="base.html"/>
-<head/>
-<body>
-    <div class="content">
+        <div class="content">
         <main>
             <p>There is no "${pkgname}" package
-            <py:if test="other_archs">for this arch</py:if>
+            {== iff(other_archs, 'for this arch') ==}
             <i>yet</i>.</p>
-            <p py:choose="other_archs">
-                <py:when test="True">See <a href="${root_url}/package/${pkgname}">archs where ${pkgname} is available</a>.</py:when>
-                <py:otherwise><p>You can search for packages in-browser on page listing <a href="${root_url}/all">all templates</a>.</p></py:otherwise>
+            <p>
+                <?py if other_archs: ?>
+                See <a href="${root_url}/package/${pkgname}">archs where ${pkgname} is available</a>.
+                
+                <?py else: ?>
+                
+                <p>You can search for packages in-browser on page listing <a href="${root_url}/all">all templates</a>.</p>
+                <?py #endif ?>
             </p>
         </main>
     </div>
-</body>
-</html>

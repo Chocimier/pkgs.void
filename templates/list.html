@@ -1,34 +1,25 @@
-<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude"
-      lang="en">
-<xi:include href="base.html"/>
-<head>
-    <title>${title} from void</title>
-</head>
-<body><!--!
---><py:def function="list_items()">
-                <li py:for="i in packages" py:with="featured = getattr(i, 'featured', False)">
-                    <strong py:strip="not featured"><a href="${root_url}/package/${i}">${i}</a><py:if test="featured"> *</py:if></strong>
-                </li>
-</py:def><!--!
-    --><div class="content">
+<?py tag = 'ul' if _context.get('bullets') else 'ol' ?>
+        <div class="content">
         <main>
             <h1>${title}</h1>
-            <em py:if="defined('subtitle')">${subtitle}</em><!--!
-            --><py:choose test=""><!--!
-            --><ul py:when="value_of('bullets', False)"> ${list_items()}
-            </ul><!--!
-            --><ol py:otherwise=""> ${list_items()}
-            </ol><!--!
-            --></py:choose>
-            <footer py:if="value_of('has_featured') or not value_of('with_devel_and_so')">
-              <p py:if="value_of('has_featured')">Items marked with * do not appear on main page.</p>
-              <p py:if="not value_of('with_devel_and_so')">List excludes devel, debug and multilib packages.</p>
+            <?py if 'subtitle' in _context: ?>
+            <em>${subtitle}</em>
+<?py #endif ?>            <{== tag ==}> 
+			<?py echo('                ') ?>
+<?py include('small/list_list.htm') ?>
+
+
+            </{== tag ==}>
+            <?py if _context.get('has_featured') or not _context.get('with_devel_and_so'): ?>
+            <footer>
+              
+              <?py if _context.get('has_featured'): ?>
+              <p>Items marked with * do not appear on main page.</p>
+              <?py #endif ?>
+              <?py if not _context.get('not with_devel_and_so'): ?>
+              <p>List excludes devel, debug and multilib packages.</p>
+              <?py #endif ?>
             </footer>
+            <?py #endif ?>
         </main>
-    </div>
-    <footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>
-</body>
-</html>
+    </div><footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>

@@ -278,11 +278,11 @@ def page_generator(pkgname, repos, single=False):
             'pkgname': pkgname,
             'other_archs': found.other,
         }
-        return present.render_template('nopkg.html', **parameters)
+        return present.render_template('nopkg.html', **parameters).rstrip('\n')
     for field in chain(parameters['fields'], [parameters['short_desc']]):
         field.presentation.update(_props_presentation(field.name))
     parameters['single_pkg'] = single
-    return present.render_template('pkgs.void.html', **parameters) + '\n'
+    return present.render_template('pkgs.void.html', **parameters)
 
 
 def _update_time(source):
@@ -322,6 +322,10 @@ def of_day():
         'bullets': True,
     }
     return present.render_template('list.html', **parameters)
+
+
+def which_package():
+    return present.render_template('which.html')
 
 
 class Collection:

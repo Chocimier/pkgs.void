@@ -1,0 +1,12 @@
+<?py for i in packages: ?>
+<?py featured = getattr(i, 'featured', False) ?>
+<li>
+<?py if featured: ?>
+<strong py:strip="not featured"><?py
+#endif ?>
+                    <a href="${root_url}/package/${i}">${i}</a>
+                    <?py if featured: ?>
+ *</strong>
+                    <?py #endif ?>
+                </li><?py
+#endfor ?>
