@@ -25,7 +25,9 @@ templates=
 updates=
 popularity=yes
 
-cd "$(dirname "$0")" || exit 1
+path="$(realpath "$(dirname "$0")")"
+dir="$(basename "$path")"
+cd $path || exit 1
 [ -r ./profile ] && . ./profile
 . venv/bin/activate
 
@@ -47,8 +49,8 @@ done
 
 mkdir -p static/source
 cd .. || exit 1
-tar cjf pkgs.void/static/source/tmp.tar.bz2 --exclude-ignore tar-exclude pkgs.void || exit 1
-cd pkgs.void || exit 1
+tar cjf "$dir/static/source/tmp.tar.bz2" --exclude-ignore tar-exclude "$dir" || exit 1
+cd "$dir" || exit 1
 mv static/source/tmp.tar.bz2  static/source/pkgs.void.tar.bz2 || exit 1
 
 if [ "$templates" ]
