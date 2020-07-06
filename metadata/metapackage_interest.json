@@ -28,6 +28,7 @@
         "xorg-minimal"
     ],
     "BORING": [
+        "WiringPi",
         "breeze-cursors",
         "cross-arm-none-eabi",
         "cross-vpkg-dummy",
@@ -44,6 +45,7 @@
         "mesa-ati-dri",
         "mesa-intel-dri",
         "mesa-nouveau-dri",
+        "ncurses-libtinfo-devel",
         "python-iwlib",
         "python-jupyter",
         "python3-jupyter",
@@ -54,6 +56,7 @@
         "tesseract-ocr-all",
         "tesseract-ocr-basic",
         "thunderbird-i18n",
+        "util-linux-libs",
         "wifi-firmware",
         "wireguard",
         "xorg-fonts",
