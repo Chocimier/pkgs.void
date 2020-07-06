@@ -4,11 +4,11 @@
 <py:match path="head" once="true">
     <head py:attrs="select('@*')">
         <meta charset="utf-8"/>
-        <title py:with="title = list(select('title/text()'))" py:choose="">
-            <py:when test="title">${title}</py:when>
-            <py:otherwise>Packages from Void</py:otherwise>
-        </title>
-        <link rel="stylesheet" href="${root_url}/static/style.css" type="text/css"/>
+        <title py:with="title = list(select('title/text()'))" py:choose=""><!--!
+         --><py:when test="title">${title}</py:when><!--!
+         --><py:otherwise>Packages from Void</py:otherwise><!--!
+     --></title>
+        <link href="${root_url}/static/style.css" rel="stylesheet" type="text/css"/>
         ${select('*[local-name()!="title"]')}
     </head>
 </py:match>
@@ -23,12 +23,12 @@
                     <li><a href="${root_url}/all">All packages</a></li>
                 </ul>
             </nav>
-            <form method="GET" action="${root_url}/search" class="searchbox">
-                <input type="text" name="term"/>
+            <form action="${root_url}/search" class="searchbox" method="GET">
+                <input name="term" type="text"/>
                 <input type="submit" value="View"/>
             </form>
         </header>
         ${select('*')}
-    </body>
-</py:match>
+
+    </body></py:match>
 </html>

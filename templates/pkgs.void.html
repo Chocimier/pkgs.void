@@ -32,7 +32,8 @@
         <main>
             <div class="column">
                  <h2>${pkgname}</h2>
-                 <p>${list_with_archs(short_desc)}</p>
+                 <p>${list_with_archs(short_desc)}
+</p>
                  <py:if test="single_pkg">
                      <hr/>
                      <p py:with="version=next(next(versions.by_iset).by_libc)">Build for ${version.data.iset}-${version.data.libc}, version
@@ -68,9 +69,9 @@
                       --><py:when test="None">${list_with_archs(field)}</py:when><!--!
                       --><py:when test="'minmax'">${minmax(field)}</py:when><!--!
                       --><py:otherwise>${field.value}</py:otherwise><!--!
-                    --></py:choose><!--!
-                  --></dd>
-                 </py:for>
+                    --></py:choose>
+</dd>
+</py:for>
                  </dl>
                  </div>
             </main>
@@ -83,7 +84,7 @@
               --></py:for>
             </ul>
           </section>
-            <py:for each="template in mainpkg.pkgname.value"><!--!
+            <py:for each="template in sorted(mainpkg.pkgname.value)"><!--!
            --><a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template<!--!
             --><py:if test="len(mainpkg.pkgname.value) > 1"> (${template})</py:if><!--!
             --></a><!--!

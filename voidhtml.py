@@ -138,7 +138,7 @@ _DISPLAY_FIELD_NAMES = {
 }
 
 
-_RESTRICTED_BUILD_DATE = "It's up to you"
+_RESTRICTED_BUILD_DATE = "It’s up to you"
 
 
 def display_field_name(field):
@@ -282,7 +282,7 @@ def page_generator(pkgname, repos, single=False):
     for field in chain(parameters['fields'], [parameters['short_desc']]):
         field.presentation.update(_props_presentation(field.name))
     parameters['single_pkg'] = single
-    return present.render_template('pkgs.void.html', **parameters)
+    return present.render_template('pkgs.void.html', **parameters) + '\n'
 
 
 def _update_time(source):
