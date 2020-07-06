@@ -19,7 +19,6 @@ musl/nonfree/armv6l-musl
 musl/nonfree/armv7l
 musl/nonfree/armv7l-musl
 musl/nonfree/i686
-musl/nonfree/i686-musl
 musl/nonfree/x86_64
 musl/nonfree/x86_64-musl
 nonfree/armv6l
