@@ -21,7 +21,7 @@
 mirror=https://alpha.de.repo.voidlinux.org
 rsyncmirror=rsync://alpha.de.repo.voidlinux.org/voidmirror/current/
 download=yes
-templates=
+templates=yes
 updates=
 popularity=yes
 
@@ -40,6 +40,7 @@ do
             mirror="$1"
             ;;
         -P) popularity= ;;
+        -T) templates= ;;
         -t) templates=yes ;;
         -u) updates=yes ;;
         *) break
@@ -57,16 +58,11 @@ if [ "$templates" ]
 then
     : "${XBPS_DISTDIR:=$(xdistdir)}"
     ( cd "$XBPS_DISTDIR" || exit $?
-    git checkout -q xbps-src-p || exit $?
     if [ "$download" ]
     then
-        git fetch xbps-src-p -q &&
-        git checkout --detach -q &&
-        git branch -f xbps-src-p xbps-src-p/xbps-src-p -q &&
-        git checkout -q xbps-src-p &&
-        git fetch -q origin &&
-        git rebase -q origin/master || exit $?
+        git fetch -q origin || exit $?
     fi
+    git cz -q origin/master || exit $?
     ) || exit $?
 fi
 
