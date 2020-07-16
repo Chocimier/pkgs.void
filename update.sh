@@ -72,12 +72,16 @@ cd data || exit 1
 repos=$(cat ../repos.list)
 
 for path in $repos; do
+	extract_dir=$(../repopaths.py directory_name "$path")
+	rm -r "$extract_dir"
+done
+
+for path in $repos; do
 	arch="$(echo "$path" | tr / _)"
 	filename="$arch-repodata.tar.xz"
 	extract_dir=$(../repopaths.py directory_name "$path")
 	[ "$download" ] && wget -q -O "$filename" "$mirror/current/$path-repodata"
-	rm -r "$extract_dir"
-	mkdir "$extract_dir"
+	mkdir "$extract_dir" || exit $?
 	tar xf "$filename" -C "$extract_dir"
 done
 
