@@ -26,6 +26,8 @@ DATADIR = 'data'
 
 def directory_name(repo):
     result = ''
+    if 'musl/' in repo:
+        result += 'musl_'
     for i in ('multilib', 'nonfree', 'debug'):
         if i in repo:
             result += i + '_'
