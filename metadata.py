@@ -22,10 +22,18 @@ from custom_types import Interest
 class MetapackageInterest:
     def __init__(self):
         self._map = {}
-        with open('metadata/metapackage_interest.json') as file:
-            for interest, packages in json.load(file).items():
-                for package in packages:
-                    self._map[package] = getattr(Interest, interest)
+        self._load_interest('metadata/metapackage_interest.json')
+        self._load_interest('metadata/metapackage_interest.local.json')
+
+    def _load_interest(self, path):
+        try:
+            file = open(path)
+        except FileNotFoundError:
+            return
+        for interest, packages in json.load(file).items():
+            for package in packages:
+                self._map[package] = getattr(Interest, interest)
+        file.close()
 
     def get(self, pkgname):
         return self._map.get(pkgname, Interest.NOVEL)

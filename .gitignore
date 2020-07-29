@@ -1,4 +1,5 @@
 data/
+metadata/metapackage_interest.local.json
 static/generated/
 static/source/
 venv/
