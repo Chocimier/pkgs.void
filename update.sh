@@ -81,6 +81,9 @@ for path in $repos; do
 	filename="$arch-repodata.tar.xz"
 	extract_dir=$(../repopaths.py directory_name "$path")
 	[ "$download" ] && wget -q -O "$filename" "$mirror/current/$path-repodata"
+	if ! [ -s "$filename" ]; then
+		continue
+	fi
 	mkdir "$extract_dir" || exit $?
 	tar xf "$filename" -C "$extract_dir"
 done
