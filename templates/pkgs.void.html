@@ -16,40 +16,23 @@
                  
                  
                  <?py else: ?>
-                 <table>
-                   <thead>
-                     <tr>
-                       <td/>
-                       <?py for libc in versions.by_libc: ?>
-                       
-                       <th scope="col">${libc.libc}</th>
-                       <?py #endfor ?>
-                       
-                     </tr>
-                   </thead>
-                   <tbody>
-                     <?py for idx, iset in enumerate(versions.by_iset): ?>
-{== iff(idx == 0, '                     ') ==}<tr>
-                       <th scope="row">${iset.iset}</th>
-                       
-                       <?py for version in iset.by_libc: ?>
-						   <?py if version: ?>
-                       <td><a href="${root_url}/package/${pkgname}/${version.data['iset']}-${version.data['libc']}">${version.version}<sub>_${version.revision}</sub></a></td>
-						   <?py else: ?>
-                       <td/>
-						   <?py #endif ?>
-                       
-                       <?py #endfor ?>
-                     </tr><?py #endfor ?>
 
-                   </tbody>
-                 </table>
+				 <?py for verrev, archs in versions.by_version: ?>
+				 <div class="archs-per-version">
+				 <h4>Version ${verrev}</h4>
+					 <?py for idx, version in enumerate(archs): ?>
+					 <?py arch = '{iset}-{libc}'.format(**version.data) ?>
+					 ${iff(idx > 0, ' - ')}<a href="${root_url}/package/${pkgname}/${arch}">${arch}</a>
+					 <?py #endfor ?>
+				 </div>
+				 <?py #endfor ?>
 				 <?py #endif ?>
 				 <?py if upstreamver: ?>
                  <p>We know that authors released version<py:for each="version in upstreamver"> ${version}</py:for>. Please give maintainer some time to update.</p>
 				 <?py #endif ?>
 				 <?py if fields: ?>
                  
+                 <h3>Details</h3>
                  <dl>
                  
 				 <?py for field in fields: ?>

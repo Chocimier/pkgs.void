@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from collections import namedtuple
+from collections import defaultdict, namedtuple
 from enum import Enum
 
 
@@ -48,6 +48,18 @@ class Binpkgs:
                 'by_iset': (self._data.get((iset, libc))
                             for iset in sorted(self._isets))
             })
+
+    @staticmethod
+    def _arch_sortkey(version):
+        return '{iset}-{libc}'.format(**version.data)
+
+    @property
+    def by_version(self):
+        versions = defaultdict(list)
+        for value in self._data.values():
+            versions[value.verrev].append(value)
+        for key in sorted(versions.keys()):
+            yield key, sorted(versions[key], key=self._arch_sortkey)
 
     @property
     def by_iset(self):
@@ -89,3 +101,4 @@ class Version:
         self.version = components[0]
         self.revision = components[1]
         self.data = kwargs
+        self.verrev = version

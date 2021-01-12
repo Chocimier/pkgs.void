@@ -20,7 +20,6 @@ header {
 
 a {
     color: #0000E0;
-    text-decoration: inherit;
 }
 
 .horizontal {
@@ -31,14 +30,6 @@ a {
 .horizontal li {
     display: inline;
     margin: auto 1ex;
-}
-
-td {
-   padding: 0.5ex;
-}
-
-tbody tr:nth-child(2n+1) {
-    background: #bfb;
 }
 
 dd {
@@ -70,4 +61,8 @@ hr {
 li > aside, .masked > aside {
     font-size: 0.8em;
     display: inline;
+}
+
+.archs-per-version a {
+    white-space: nowrap;
 }
