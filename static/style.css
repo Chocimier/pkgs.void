@@ -4,6 +4,7 @@ html, body {
 }
 
 header {
+    font-size: 1.2em;
     text-align: right;
 }
 
@@ -20,10 +21,6 @@ header {
 a {
     color: #0000E0;
     text-decoration: inherit;
-}
-
-header {
-    font-size: 1.2em;
 }
 
 .horizontal {
