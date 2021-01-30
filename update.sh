@@ -73,7 +73,7 @@ repos=$(cat ../repos.list)
 
 for path in $repos; do
 	extract_dir=$(../repopaths.py directory_name "$path")
-	rm -r "$extract_dir"
+	[ -e "$extract_dir" ] && rm -r "$extract_dir"
 done
 
 for path in $repos; do
