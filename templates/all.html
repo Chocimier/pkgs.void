@@ -4,9 +4,9 @@
             <h1>All packages</h1>
             <dl>
                 <?py for i in packages: ?>
-                <dt><a href="${root_url}/package/${i['pkgname']}">${i['pkgname']}</a></dt>
-                <dd>${i['short_desc']}</dd>
-                <?py #endfor ?>
+<dt><a href="./package/${i['pkgname']}">${i['pkgname']}</a></dt>
+<dd>${i['short_desc']}</dd>
+<?py #endfor ?>
             </dl>
         </main>
     </div>
