@@ -62,7 +62,7 @@ then
     then
         git fetch -q origin || exit $?
     fi
-    git cz -q origin/master || exit $?
+    git checkout -q origin/master || exit $?
     ) || exit $?
 fi
 
