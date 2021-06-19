@@ -3,11 +3,11 @@
         <main>
             <h1>Find packages</h1>
             <form action="${root_url}/search" method="GET">
-                <input type=text name=term value="{== escape_attr(term) ==}" /><br/>
+                <input type=text name=term value="{== escape_attr(term) ==}" class="form-control"/><br/>
                 <?py for f in fields: ?>
                 <label><input type="checkbox" name="by"${iff(f in checked, ' checked="checked"')} value="${f}"/> by ${f}</label><br/>
                 <?py #endfor ?>
-                <input type="submit" name="find" value="Find"/>
+                <input type="submit" name="find" value="Find" class="btn btn-green"/>
             </form>
             <?py if error: ?>
             ${error}<br/>

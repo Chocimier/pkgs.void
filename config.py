@@ -10,6 +10,10 @@ DEVEL_MODE = False
 
 ROOT_URL = '/pkgs.void'
 
+ASSETS_URL = '/pkgs.void/static'
+
+VOIDLINUX_URL = 'https://voidlinux.org'
+
 REPOS = [
     'aarch64',
     'aarch64-musl',

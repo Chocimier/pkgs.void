@@ -7,27 +7,57 @@
 
     <head>
         <meta charset="utf-8"/>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>${_context.get('title', 'Packages')} from Void</title>
-        <link href="${root_url}/static/style.css" rel="stylesheet" type="text/css"/>
-        
+        <link rel="icon" type="image/png" href="${assets_url}/img/favicon.png" />
+        <link rel="stylesheet" href="${assets_url}/css/packages.css"/>
+        <link rel="stylesheet" href="${assets_url}/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${assets_url}/css/screen.css">
+        <link rel="stylesheet" href="${assets_url}/css/misc.css">
+        <link href='${assets_url}/css/font-ubuntu.css' rel='stylesheet' type='text/css'>
+        <script src="${assets_url}/js/jquery.min.js"></script>
+        <script src="${assets_url}/js/bootstrap.min.js"></script>
+        <script src="${assets_url}/js/navbar.js"></script>
+
     </head>
 
 
     <body>
         <header>
-            <nav>
-                <ul class="horizontal">
-                    <li><a href="${root_url}">Homepage</a></li>
-                    <li><a href="https://github.com/void-linux/void-packages">Templates repository</a></li>
-                    <li><a href="https://voidlinux.org">Void Linux homepage</a></li>
-                    <li><a href="${root_url}/all">All packages</a></li>
-                </ul>
+            <nav class="navbar navbar-default navbar-inverse navbar-fixed-top" role="navigation">
+                <div class="container">
+                    <div class="navbar-header">
+                        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#void-collapsed-navbar">
+                            <span class="sr-only">Toggle navigation</span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </button>
+                    </div>
+                </div>
+                <div class="collapse navbar-right navbar-collapse" id="void-collapsed-navbar">
+                    <ul class="nav navbar-nav continuous">
+                        <li><a href="${voidlinux_url}/">Home</a></li>
+                        <li><a href="${voidlinux_url}/news">News</a></li>
+                        <li><a href="${voidlinux_url}/download/">Download</a></li>
+                        <li><a href="${root_url}">Packages</a></li>
+                        <li><a href="${voidlinux_url}/acknowledgments/">Acknowledgments</a></li>
+                        <li><a href="https://docs.voidlinux.org">Documentation</a></li>
+                        <li><a href="https://man.voidlinux.org/">Manual pages</a></li>
+                        <li><a href="https://github.com/void-linux">Github</a></li>
+                    </ul>
+                </div>
             </nav>
-            <form action="${root_url}/search" class="searchbox" method="GET">
-                <input name="term" type="text"/>
-                <input type="submit" value="View"/>
-                <input type="submit" name="find" value="Find"/>
+            <div class="searchbar">
+            <form action="${root_url}/search" method="GET" class="form-inline">
+                <a href="${root_url}">Featured packages</a>
+                <a href="${root_url}/all">All packages</a>
+                <input name="term" type="text" class="form-control"/>
+                <input type="submit" value="View" class="btn btn-green"/>
+                <input type="submit" name="find" value="Find" class="btn btn-green"/>
             </form>
+            </div>
         </header>
 {== _content ==}
     </body>
