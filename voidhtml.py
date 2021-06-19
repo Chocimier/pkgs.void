@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2021 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -274,6 +274,8 @@ def page_generator(pkgname, repos, single=False):
     found = data_generator(pkgname, repos)
     parameters = found.parameters
     if not parameters:
+        if not found.other:
+            return find(pkgname, [])
         parameters = {
             'pkgname': pkgname,
             'other_archs': found.other,
@@ -311,6 +313,24 @@ def list_all():
             } for i in packages),
     }
     return present.render_template('all.html', **parameters)
+
+
+def find(term, fields):
+    source = datasource.factory()
+    packages = source.search(term, fields)
+    all_fields = source.search_fields()
+    parameters = {
+        'fields': all_fields,
+        'checked': fields or all_fields,
+        'term': term,
+    }
+    if isinstance(packages, str):
+        parameters['packages'] = []
+        parameters['error'] = packages
+    else:
+        parameters['packages'] = list(packages)
+        parameters['error'] = None
+    return present.render_template('find.html', **parameters)
 
 
 def of_day():

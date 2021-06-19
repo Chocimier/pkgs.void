@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2021 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -159,6 +159,16 @@ class Datasource(metaclass=abc.ABCMeta):
     def list_all(self):
         '''Returns list of all packages.'''
 
+    @staticmethod
+    @abc.abstractmethod
+    def search_fields():
+        '''Returns names of searchable fields'''
+
+    @abc.abstractmethod
+    def search(self, term, fields):
+        '''Searches for packages described by term.
+        Returns iterator of dictionaries with keys 'name', 'description'.'''
+
     @abc.abstractmethod
     def update(self, **kwargs):
         '''Finds packages matching criteria passed as keyword arguments
@@ -233,6 +243,12 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create table if not exists auxiliary
             as select ? as key, ? as value
             ''', ['update_time', time])
+        self._cursor.execute('''create virtual table if not exists
+            search_terms using fts4(
+            {},
+            tokenize=porter
+            )
+            '''.format(', '.join(self.search_fields())))
 
     def __enter__(self):
         return self
@@ -250,8 +266,27 @@ class SqliteDataSource(Datasource):
             ', '.join('?' * len(package_row))
         )
         self._cursor.execute(query, package_row)
+        self._add_search_terms(package_row)
         self._add_daily_hashes(package_row, dates)
         self._register_metapackage(package_row)
+
+    def _add_search_terms(self, package_row):
+        for data in (package_row.repodata, package_row.templatedata):
+            self._add_search_terms_from_data(package_row.pkgname, data)
+
+    def _add_search_terms_from_data(self, pkgname, data):
+        data = from_json(data)
+        if not data:
+            return
+        query = 'INSERT INTO search_terms ({}) VALUES ({})'.format(
+            ', '.join(self.search_fields()),
+            ', '.join('?' * len(self.search_fields()))
+        )
+        self._cursor.execute(query, (
+            pkgname,
+            data.get('short_desc'),
+            data.get('homepage'),
+            ))
 
     def _add_daily_hashes(self, package_row, dates):
         if not dailyable(package_row):
@@ -314,6 +349,34 @@ class SqliteDataSource(Datasource):
         return (PackageRow.from_record(x) for x in self._cursor.fetchall())
 
     @staticmethod
+    def search_fields():
+        '''Returns names of searchable fields'''
+        return (
+            'name',
+            'description',
+            'homepage',
+            )
+
+    def search(self, term, fields):
+        '''Searches for packages described by term.
+        Returns iterator of dictionaries with keys 'name', 'description'.'''
+        effective_fields = (
+            set(self.search_fields()).intersection(fields)
+            or self.search_fields()
+        )
+        query = '''select distinct name, description from search_terms
+            where {}
+            order by name'''.format(
+                ' or '.join(f'{f} match ?' for f in effective_fields)
+            )
+        try:
+            self._cursor.execute(query, [term]*len(effective_fields))
+        except sqlite3.OperationalError:
+            return 'Invalid search term'
+        keys = ('name', 'description')
+        return (dict(zip(keys, vals)) for vals in self._cursor.fetchall())
+
+    @staticmethod
     def _sets(argname):
         prefix = 'set_'
         if argname.startswith(prefix):
@@ -322,7 +385,11 @@ class SqliteDataSource(Datasource):
 
     def update(self, **kwargs):
         '''Finds packages matching criteria passed as keyword arguments
-        and sets values passed as keyword arguments prefixed with 'set_'.'''
+        and sets values passed as keyword arguments prefixed with 'set_'.
+
+        NOTE: update of search_terms is done only for usage
+        existing at the time of writing, that is adding templatedata
+        '''
         updated = [i for i in kwargs if self._sets(i) in PackageRow._fields]
         fixed = [
             i
@@ -334,6 +401,10 @@ class SqliteDataSource(Datasource):
             ' AND '.join('{} = ?'.format(i) for i in fixed)
         )
         self._cursor.execute(query, [kwargs[i] for i in updated + fixed])
+        pkgname = kwargs.get('pkgname')
+        templatedata = kwargs.get('set_templatedata')
+        if pkgname and templatedata:
+            self._add_search_terms_from_data(pkgname, templatedata)
 
     def of_day(self, date):
         '''Returns different packages every day'''
@@ -431,6 +502,10 @@ class SqliteDataSource(Datasource):
         return (x[0] for x in self._cursor.fetchall())
 
     def finish_creating(self):
+        self._cursor.execute('''insert into
+            search_terms(search_terms)
+            values('optimize')
+            ''')
         self._cursor.execute('''create index if not exists pkgname_idx
             on packages (
             pkgname
