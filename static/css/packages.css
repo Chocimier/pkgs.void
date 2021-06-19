@@ -1,0 +1,37 @@
+.content, .searchbar {
+    max-width: 90ex;
+    max-width: 90ch;
+    margin: auto;
+}
+
+.searchbar {
+    text-align: right;
+}
+
+dl dd {
+	margin-bottom: 1ex;
+	margin-left: 4ex;
+	margin-left: 4ch;
+}
+
+ul, .breakable {
+	columns: 40ex 2;
+	columns: 40ch 2;
+}
+
+ul.continuous {
+	columns: auto 1;
+}
+
+li, .non-breakable {
+    break-inside: avoid;
+}
+
+li > aside, .masked > aside {
+    font-size: 0.8em;
+    display: inline;
+}
+
+.archs-per-version a {
+    white-space: nowrap;
+}
