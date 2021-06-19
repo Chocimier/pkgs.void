@@ -198,6 +198,10 @@ class Datasource(metaclass=abc.ABCMeta):
         at_most-th longest-name-bearing package'''
 
     @abc.abstractmethod
+    def add_auxiliary(self, key, value):
+        '''Sets auxiliary values of _key_.'''
+
+    @abc.abstractmethod
     def auxiliary(self, key):
         '''Returns auxiliary values of _key_.'''
 
@@ -491,6 +495,14 @@ class SqliteDataSource(Datasource):
         )
         self._cursor.execute(query, [int(at_most)])
         return (x[0] for x in self._cursor.fetchall())
+
+    def add_auxiliary(self, key, value):
+        '''Sets auxiliary values of _key_.'''
+        query = (
+            'INSERT INTO auxiliary (key, value)'
+            'VALUES (?, ?)'
+        )
+        self._cursor.execute(query, [key, value])
 
     def auxiliary(self, key):
         '''Returns auxiliary values of _key_.'''

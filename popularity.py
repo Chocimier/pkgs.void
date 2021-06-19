@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2021 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -17,7 +17,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import json
-import math
 import os
 
 import datasource
@@ -26,12 +25,17 @@ from repopaths import DATADIR
 
 def build_db(source):
     data = json.load(open(os.path.join(DATADIR, 'popcorn.json')))
-    reports = data.get('UniqueInstalls') or 1
+    reports = data.get('UniqueInstalls')
+    if not reports:
+        return
+    source.add_auxiliary('popularity_reports', reports)
+    source.update(
+        set_popularity=0
+    )
     for pkgname, copies in data['Packages'].items():
-        popularity = math.ceil(100 * copies / reports)
         source.update(
             pkgname=pkgname,
-            set_popularity=popularity
+            set_popularity=copies
         )
 
 

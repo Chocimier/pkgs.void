@@ -1,0 +1,7 @@
+<?py min=field.presentation['formatter'](field.value['min']); max=field.presentation['formatter'](field.value['max']) ?>
+<?py if min == max: ?>
+${min if min != 0 else 'No'} ${'usage' if min == 1 else 'usages'}
+<?py else: ?>
+${min} - ${max} usages
+<?py #endif ?>
+in ${popularity_reports} reports

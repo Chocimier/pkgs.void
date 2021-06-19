@@ -43,6 +43,8 @@
 					 <?py include('small/list_with_archs.html') ?>
 					 <?py elif presenter == 'minmax': ?>
 					  <?py include('small/minmax.html', field=field) ?>
+					 <?py elif presenter == 'popularity': ?>
+					  <?py include('small/popularity.html', field=field) ?>
                      <?py else: ?>
 					  ${field.value}
                      <?py #endif ?>

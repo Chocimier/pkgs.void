@@ -164,7 +164,7 @@ def as_date(value):
 
 
 def as_popularity(value):
-    return f'{value}%'
+    return f'{value}'
 
 
 def as_repository(value):

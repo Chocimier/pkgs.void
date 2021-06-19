@@ -76,7 +76,10 @@ def _relevant_props():
             'name': 'reverts',
             'islist': True
         },
-        {'name': 'popularity'},
+        {
+            'name': 'popularity',
+            'combiner': present.combine_minmax
+        },
         {
             'name': 'mainpkgname',
             'combiner': present.combine_set
@@ -113,9 +116,9 @@ def _props_presentation(field):
             'formatter': present.as_size,
             'presenter': 'minmax',
         },
+        'popularity': {'presenter': 'popularity'},
         'conflicts': {'formatter': present.as_package},
         'provides': {'formatter': present.as_package},
-        'popularity': {'formatter': present.as_popularity},
         'run_depends': {'formatter': present.as_package},
     }
     result = {
@@ -183,7 +186,7 @@ def make_pkg(row):
         pkg['build-date'] = row.builddate
     elif row.restricted:
         pkg['build-date'] = _RESTRICTED_BUILD_DATE
-    if row.popularity:
+    if row.popularity is not None:
         pkg['popularity'] = row.popularity
     return pkg
 
@@ -254,7 +257,7 @@ def data_generator(pkgname, repos):
         binpkgs.add(pkg['verrev'], iset=pkg['iset'], libc=pkg['libc'])
         fields_dic_append(fields_dic, pkg)
     if not binpkgs:
-        return FoundPackages(None, other_archs)
+        return FoundPackages(None, other_archs, None)
     fields = combine_fields(fields_dic, binpkgs)
     separated = separate_fields(fields, SEPARATED_FIELDS)
     upstreamver = new_versions(binpkgs, separated['upstreamver'].value)
@@ -267,7 +270,7 @@ def data_generator(pkgname, repos):
         'mainpkg': {'pkgname': separated['mainpkgname']},
         'subpkgs': list(subpkgs),
         'upstreamver': upstreamver,
-    }, other_archs)
+    }, other_archs, next(source.auxiliary('popularity_reports')))
 
 
 def page_generator(pkgname, repos, single=False):
@@ -284,6 +287,7 @@ def page_generator(pkgname, repos, single=False):
     for field in chain(parameters['fields'], [parameters['short_desc']]):
         field.presentation.update(_props_presentation(field.name))
     parameters['single_pkg'] = single
+    parameters['popularity_reports'] = found.popularity_reports
     return present.render_template('pkgs.void.html', **parameters)
 
 
