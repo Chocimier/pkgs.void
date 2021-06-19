@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2021 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,8 +25,9 @@ from tenjin import MemoryCacheStorage, SafeEngine
 from tenjin.escaped import as_escaped, to_escaped  # noqa, pylint: disable=import-error
 from tenjin.helpers import echo, to_str  # noqa, pylint: disable=unused-import,import-error
 
+import config
 from custom_types import ValueAt
-from sink import iff, web_parameters  # noqa, pylint: disable=unused-import
+from sink import iff  # noqa, pylint: disable=unused-import
 from config import DEVEL_MODE, ROOT_URL
 
 
@@ -52,6 +53,13 @@ def escape_attr(arg):
         .replace('"', '&quot;')
         .replace("'", '&apos;')
     )
+
+
+def web_parameters():
+    return {
+        'root_url': config.ROOT_URL,
+        'escape_attr': escape_attr,
+    }
 
 
 tenjin.helpers.escape = escape

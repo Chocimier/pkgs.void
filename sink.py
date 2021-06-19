@@ -17,8 +17,6 @@
 
 import datetime
 
-import config
-
 
 def iff(condition, truthy, falsy=None):
     return truthy if condition else falsy
@@ -26,12 +24,6 @@ def iff(condition, truthy, falsy=None):
 
 def same(arg):
     return arg
-
-
-def web_parameters():
-    return {
-        'root_url': config.ROOT_URL,
-    }
 
 
 def now():
