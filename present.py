@@ -58,6 +58,8 @@ def escape_attr(arg):
 def web_parameters():
     return {
         'root_url': config.ROOT_URL,
+        'assets_url': config.ASSETS_URL,
+        'voidlinux_url': config.VOIDLINUX_URL,
         'escape_attr': escape_attr,
     }
 
