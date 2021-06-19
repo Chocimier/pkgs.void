@@ -346,7 +346,7 @@ def metapackages():
         'bullets': True,
         'packages': packages,
         'with_devel_and_so': True,
-        'has_featured': any([i.featured for i in packages]),
+        'has_featured': any(i.featured for i in packages),
     }
     return present.render_template('list.html', **parameters)
 
