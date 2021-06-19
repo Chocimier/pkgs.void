@@ -35,3 +35,8 @@ li > aside, .masked > aside {
 .archs-per-version a {
     white-space: nowrap;
 }
+
+#void-collapsed-navbar {
+    padding-right: 15px;
+    padding-left: 15px;
+}
