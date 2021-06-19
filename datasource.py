@@ -398,7 +398,7 @@ class SqliteDataSource(Datasource):
         ]
         query = 'UPDATE packages SET {} WHERE {}'.format(
             ', '.join('{} = ?'.format(self._sets(i)) for i in updated),
-            ' AND '.join('{} = ?'.format(i) for i in fixed)
+            ' AND '.join('{} = ?'.format(i) for i in fixed) or True
         )
         self._cursor.execute(query, [kwargs[i] for i in updated + fixed])
         pkgname = kwargs.get('pkgname')
