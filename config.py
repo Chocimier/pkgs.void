@@ -1,5 +1,9 @@
 DAILY_HASH_BITS = 9
 
+ASSETS_URL = '/pkgs.void/static'
+
+VOIDLINUX_URL = 'https://voidlinux.org'
+
 DATASOURCE_CLASS = 'SqliteDataSource'
 
 DATASOURCE_ARGUMENTS = ['index.sqlite3']

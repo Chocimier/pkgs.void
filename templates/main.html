@@ -1,12 +1,14 @@
 <?py _context['title'] = title ?>
-        <div class="content">
-        <main>
-            <div class="breakable">
-                 
-                <?py for entry in lists: ?>
-<?py include('small/main_list.html', entry=entry) ?>
-                <?py #endfor ?>
-            </div>
-            <p>Site was updated at ${updated}.</p>
-        </main>
-    </div><footer>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</footer>
+<div class="content">
+  <main>
+    <div class="d-flex flex-wrap justify-content-between align-items-start">
+      <?py for entry in lists: ?>
+      <?py include('small/main_list.html', entry=entry) ?>
+      <?py #endfor ?>
+    </div>
+  </main>
+  <footer class="mt-4 text-center">
+    <p>Site was updated at ${updated}.</p>
+    <p>Server side code is AGPL licensed. You can view <a href="https://github.com/Chocimier/pkgs.void">git repo</a> or get <a href="${root_url}/static/source/pkgs.void.tar.bz2">source tarball</a>.</p>
+  </footer>
+</div>

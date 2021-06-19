@@ -1,34 +1,57 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${_context.get('title', 'Packages')} from Void</title>
+    <link rel="icon" type="image/png" href="${assets_url}/favicon.png" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="${assets_url}/style.css"/>
+  </head>
 
-
-
-
-
-    <head>
-        <meta charset="utf-8"/>
-        <title>${_context.get('title', 'Packages')} from Void</title>
-        <link href="${root_url}/static/style.css" rel="stylesheet" type="text/css"/>
-        
-    </head>
-
-
-    <body>
-        <header>
-            <nav>
-                <ul class="horizontal">
-                    <li><a href="${root_url}">Homepage</a></li>
-                    <li><a href="https://github.com/void-linux/void-packages">Templates repository</a></li>
-                    <li><a href="https://voidlinux.org">Void Linux homepage</a></li>
-                    <li><a href="${root_url}/all">All packages</a></li>
-                </ul>
-            </nav>
-            <form action="${root_url}/search" class="searchbox" method="GET">
-                <input name="term" type="text"/>
-                <input type="submit" value="View"/>
-                <input type="submit" name="find" value="Find"/>
+  <body>
+    <div class="bg-void">
+      <header class="container d-flex flex-wrap justify-content-center py-3 mb-4">
+        <ul class="nav nav-pills">
+          <li class="nav-item"><a class="nav-link" href="${voidlinux_url}/">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="${voidlinux_url}/news">News</a></li>
+          <li class="nav-item"><a class="nav-link" href="${voidlinux_url}/download/">Download</a></li>
+          <li class="nav-item"><a class="nav-link" aria-current="page" href="${root_url}">Packages</a></li>
+          <li class="nav-item"><a class="nav-link" href="${voidlinux_url}/acknowledgments/">Acknowledgments</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://docs.voidlinux.org">Documentation</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://man.voidlinux.org/">Manual pages</a></li>
+          <li class="nav-item"><a class="nav-link" href="https://github.com/void-linux">Github</a></li>
+        </ul>
+      </header>
+    </div>
+    <div class="container">
+      <div class="searchbar mb-4">
+        <div class="row g-3 align-items-center">
+          <div class="col-auto">
+            <a href="${root_url}">Featured packages</a>
+          </div>
+          <div class="col-auto">
+            <a href="${root_url}/all">All packages</a>
+          </div>
+          <div class="col">
+            <form action="${root_url}/search" method="GET" class="form-inline">
+              <div class="row g-3 align-items-center">
+                <div class="col">
+                  <input name="term" type="text" class="form-control"/>
+                </div>
+                <div class="col-auto">
+                  <input type="submit" value="View" class="btn btn-primary"/>
+                </div>
+                <div class="col-auto">
+                  <input type="submit" name="find" value="Find" class="btn btn-primary"/>
+                </div>
+              </div>
             </form>
-        </header>
-{== _content ==}
-    </body>
+          </div>
+        </div>
+      </div>
+      {== _content ==}
+    </div>
+  </body>
 </html>
