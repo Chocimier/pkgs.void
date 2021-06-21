@@ -5,3 +5,4 @@ static/source/
 venv/
 *.sqlite3
 profile.*
+config.ini

@@ -21,7 +21,7 @@ import json
 import sqlite3
 from collections import namedtuple
 
-import config
+from settings import config
 import sink
 from custom_types import Interest
 from metadata import MetapackageInterest
@@ -557,8 +557,8 @@ def custom_factory(classname, *args, **kwargs):
 
 def datasource_arguments(temporary):
     if temporary:
-        return config.DATASOURCE_ARGUMENTS_TEMPORARY
-    return config.DATASOURCE_ARGUMENTS
+        return config.DATASOURCE_ARGUMENTS_TEMPORARY.split(',')
+    return config.DATASOURCE_ARGUMENTS.split(',')
 
 
 def factory(temporary=False):

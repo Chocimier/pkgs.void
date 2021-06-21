@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2020 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2020-2021 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,7 @@ import gprof2dot
 
 sys.path.append('.')
 import voidhtml # noqa, pylint: disable=wrong-import-position
-from config import REPOS # noqa, pylint: disable=wrong-import-position
+from settings import config # noqa, pylint: disable=wrong-import-position
 
 
 _PROFILE = 'profile'
@@ -33,7 +33,7 @@ _TIMEIT = 'timeit'
 
 
 _CODE_MAP = {
-    "gcc": "voidhtml.page_generator('gcc', REPOS)",
+    "gcc": "voidhtml.page_generator('gcc', config.REPOS)",
     "main": "voidhtml.main_page()",
     "newest": "voidhtml.newest()",
     "of_day": "voidhtml.of_day()",
@@ -48,14 +48,14 @@ def is_func(constant, variable):
 
 
 def _heat_up():
-    voidhtml.page_generator('gcc', REPOS)
+    voidhtml.page_generator('gcc', config.REPOS)
     voidhtml.newest()
 
 
 def _timeit_run(name, code):
     time = timeit.timeit(
         code,
-        setup="import voidhtml; from config import REPOS",
+        setup="import voidhtml; from settings import config",
         number=100
     )
     print(f'{name}: {time}s')

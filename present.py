@@ -25,10 +25,9 @@ from tenjin import MemoryCacheStorage, SafeEngine
 from tenjin.escaped import as_escaped, to_escaped  # noqa, pylint: disable=import-error
 from tenjin.helpers import echo, to_str  # noqa, pylint: disable=unused-import,import-error
 
-import config
 from custom_types import ValueAt
+from settings import config
 from sink import iff  # noqa, pylint: disable=unused-import
-from config import DEVEL_MODE, ROOT_URL
 
 
 _CACHED_LOADER = None
@@ -60,6 +59,7 @@ def web_parameters():
         'root_url': config.ROOT_URL,
         'assets_url': config.ASSETS_URL,
         'voidlinux_url': config.VOIDLINUX_URL,
+        'generated_files_url': config.GENERATED_FILES_URL,
         'escape_attr': escape_attr,
     }
 
@@ -69,7 +69,7 @@ tenjin.helpers.escape = escape
 
 def _loader():
     global _CACHED_LOADER  # pylint: disable=global-statement
-    if DEVEL_MODE or _CACHED_LOADER is None:
+    if config.DEVEL_MODE or _CACHED_LOADER is None:
         _CACHED_LOADER = SafeEngine(
             path=['templates'],
             cache=MemoryCacheStorage()
@@ -127,7 +127,7 @@ def as_package(value):
             break
     if pkgver == '>=0':
         pkgver = ''
-    href = ROOT_URL + '/package/' + pkgname
+    href = config.ROOT_URL + '/package/' + pkgname
     if '_' in pkgver:
         pairs = []
         version = ''

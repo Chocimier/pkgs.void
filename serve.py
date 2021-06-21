@@ -21,7 +21,7 @@ import sys
 from bottle import ServerAdapter, default_app, error, redirect
 from bottle import request, route, run, server_names, static_file
 
-from config import DEVEL_MODE, ROOT_URL, REPOS
+from settings import config
 from voidhtml import (
     find, lists_index, longest_names, main_page, metapackages,
     newest, of_day, page_generator, popular, which_package
@@ -36,12 +36,17 @@ def search():  # pylint: disable=inconsistent-return-statements
     fields = request.query.getall('by')  # pylint: disable=no-member
     if finding or fields:
         return find(term, fields)
-    redirect(ROOT_URL + '/package/' + term)
+    redirect(config.ROOT_URL + '/package/' + term)
 
 
 @route('/all')
 def list_all_():
-    return static_file('all.html', 'static/generated')
+    return static_file('all.html', config.GENERATED_FILES_PATH)
+
+
+@route(config.GENERATED_FILES_URL + '/pkgs.void.tar.bz2')
+def source_tarball():
+    return static_file('pkgs.void.tar.bz2', config.GENERATED_FILES_PATH)
 
 
 route('/')(route('')(main_page))
@@ -56,7 +61,7 @@ route('/package')(which_package)
 
 @route('/package/<pkgname>')
 def package(pkgname):
-    return page_generator(pkgname, repos=REPOS)
+    return page_generator(pkgname, repos=config.REPOS)
 
 
 @route('/package/<pkgname>/<iset>-<libc>')
@@ -99,7 +104,7 @@ class StripSlashMiddleware():
 
 application = StripSlashMiddleware(  # pylint: disable=invalid-name
     UrlPrefixMiddleware(
-        ROOT_URL,
+        config.ROOT_URL,
         default_app()
     )
 )
@@ -122,7 +127,7 @@ def serve(args):
     except IndexError:
         pass
 
-    run(app=application, debug=True, reloader=DEVEL_MODE, **kwargs)
+    run(app=application, debug=True, reloader=config.DEVEL_MODE, **kwargs)
 
 
 if __name__ == '__main__':
