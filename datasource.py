@@ -17,9 +17,10 @@
 import abc
 import datetime
 import hashlib
-import json
 import sqlite3
 from collections import namedtuple
+
+import ujson as json
 
 from settings import config
 import sink
@@ -321,10 +322,11 @@ class SqliteDataSource(Datasource):
 
     def _register_metapackage(self, package_row):
         pkgname = package_row.pkgname
+        repodata = package_row.repodata
         if (package_row.depends_count
                 and package_row.depends_count > 1
                 and not pkgname.endswith('-32bit')
-                and '"installed_size": 0' in package_row.repodata):
+                and from_json(repodata).get('installed_size') == 0):
             query = '''INSERT OR IGNORE INTO metapackages
                 (pkgname, classification)
                 VALUES (?, ?)'''
