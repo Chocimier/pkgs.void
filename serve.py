@@ -17,6 +17,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
+import urllib.parse
 
 from bottle import ServerAdapter, default_app, error, redirect
 from bottle import request, route, run, server_names, static_file
@@ -36,7 +37,7 @@ def search():  # pylint: disable=inconsistent-return-statements
     fields = request.query.getall('by')  # pylint: disable=no-member
     if finding or fields:
         return find(term, fields)
-    redirect(config.ROOT_URL + '/package/' + term)
+    redirect(config.ROOT_URL + '/package/' + urllib.parse.quote(term))
 
 
 @route('/all')

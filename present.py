@@ -15,6 +15,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 from collections import Counter, namedtuple
+from urllib.parse import quote as urlquote
 
 # pylint can't import modules from create_module, so import-error
 # some functions are used only in templates, so unused-import
@@ -52,6 +53,7 @@ def web_parameters():
         'assets_url': config.ASSETS_URL,
         'voidlinux_url': config.VOIDLINUX_URL,
         'generated_files_url': config.GENERATED_FILES_URL,
+        'urlquote': urlquote,
     }
 
 
@@ -120,7 +122,7 @@ def as_package(value):
             break
     if pkgver == '>=0':
         pkgver = ''
-    href = config.ROOT_URL + '/package/' + pkgname
+    href = config.ROOT_URL + '/package/' + urlquote(pkgname)
     if '_' in pkgver:
         pairs = []
         version = ''

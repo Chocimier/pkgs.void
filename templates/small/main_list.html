@@ -4,15 +4,14 @@
                     <{== tag ==}>
                     <?py echo('                        ') ?>
                         <?py for i in entry['packages']: ?>
-                        <?py escaped_pkgname=_escape(i) ?>
 <li>
-                            <a href="${{root_url}}/package/{== escaped_pkgname ==}">{== escaped_pkgname ==}</a>
+                            <a href="${{root_url}}/package/${urlquote(i)}">${i}</a>
                         </li><?py
                         #endfor ?>
 
                     </{== tag ==}>
                     <?py if 'more' in entry: ?>
-                    <a href="${{root_url}}/${entry['address']}">${entry['more']}</a>
+                    <a href="${{root_url}}/${urlquote(entry['address'])}">${entry['more']}</a>
                     <?py #endif ?>
                 </div>
 

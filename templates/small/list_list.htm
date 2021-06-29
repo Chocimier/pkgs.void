@@ -4,8 +4,7 @@
 <?py if featured: ?>
 <strong py:strip="not featured"><?py
 #endif ?>
-                    <?py escaped_pkgname=_escape(i) ?>
-                    <a href="${{root_url}}/package/{== escaped_pkgname ==}">{== escaped_pkgname ==}</a>
+                    <a href="${{root_url}}/package/${urlquote(str(i))}">${i}</a>
                     <?py if featured: ?>
  *</strong>
                     <?py #endif ?>
