@@ -56,7 +56,7 @@ def _timeit_run(name, code):
     time = timeit.timeit(
         code,
         setup="import voidhtml; from settings import config",
-        number=100
+        number=1000
     )
     print(f'{name}: {time}s')
 
@@ -87,7 +87,7 @@ def _profile_run(code):
 def _profile(func):
     code = _code(func)
     if code:
-        _profile_run(code)
+        _profile_run(';'.join([code]*1000))
     else:
         print('pass func name', file=sys.stderr)
         sys.exit(1)
