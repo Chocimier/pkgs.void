@@ -46,35 +46,13 @@ class CustomPreprocessor(SafePreprocessor):
         )
 
 
-def escape(arg):
-    return (
-        arg
-        .replace('&', '&amp;')
-        .replace('<', '&lt;')
-        .replace('>', '&gt;')
-    )
-
-
-def escape_attr(arg):
-    return (
-        arg
-        .replace('&', '&amp;')
-        .replace('"', '&quot;')
-        .replace("'", '&apos;')
-    )
-
-
 def web_parameters():
     return {
         'root_url': config.ROOT_URL,
         'assets_url': config.ASSETS_URL,
         'voidlinux_url': config.VOIDLINUX_URL,
         'generated_files_url': config.GENERATED_FILES_URL,
-        'escape_attr': escape_attr,
     }
-
-
-tenjin.helpers.escape = escape
 
 
 def _loader():
@@ -95,7 +73,10 @@ def parse_contact(value):
 
 def render_link(href, text):
     code = '<a href="{}">{}</a>'
-    return as_escaped(code.format(escape_attr(href), escape(text)))
+    return as_escaped(code.format(
+        tenjin.helpers.escape(href),
+        tenjin.helpers.escape(text)
+    ))
 
 
 def _masks_as_string(masks_set):
