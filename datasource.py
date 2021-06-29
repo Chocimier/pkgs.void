@@ -243,6 +243,11 @@ class SqliteDataSource(Datasource):
             unique(pkgname, date)
             )
             ''')
+        self._cursor.execute('''create table if not exists pkgnames (
+            pkgname text primary key,
+            same_template text not null
+            )
+            ''')
         self._cursor.execute('''create table if not exists metapackages (
             pkgname text unique not null,
             classification text not null
@@ -340,12 +345,14 @@ class SqliteDataSource(Datasource):
 
     def same_template(self, pkgname):
         '''Returns names of packages built from same template.'''
-        query = ('select distinct second.pkgname '
-                 'from packages as first '
-                 'join packages as second '
-                 'on first.mainpkg = second.mainpkg '
-                 'where first.pkgname = ? '
-                 'order by second.pkgname')
+        query = ('SELECT pkgname '
+                 'FROM pkgnames '
+                 'WHERE same_template = ('
+                 '  SELECT same_template '
+                 '  FROM pkgnames '
+                 '  WHERE pkgname = ? '
+                 ') '
+                 'ORDER BY pkgname')
         self._cursor.execute(query, [pkgname])
         return (x[0] for x in self._cursor.fetchall())
 
@@ -523,6 +530,14 @@ class SqliteDataSource(Datasource):
             search_terms(search_terms)
             values('optimize')
             ''')
+        self._cursor.execute('''insert or replace into
+            pkgnames(pkgname, same_template)
+            select first.pkgname, min(second.pkgname)
+                from packages as first
+                join packages as second
+                on first.mainpkg = second.mainpkg
+                group by first.pkgname
+            ''')
         self._cursor.execute('''create index if not exists pkgname_idx
             on packages (
             pkgname
@@ -538,12 +553,6 @@ class SqliteDataSource(Datasource):
             builddate desc
             )
             ''')
-        self._cursor.execute('''create index if not exists mainpkg_idx
-            on packages (
-            mainpkg,
-            pkgname
-            )
-            ''')
         self._cursor.execute('''create index if not exists popularity_idx
             on packages (
             popularity
@@ -552,6 +561,11 @@ class SqliteDataSource(Datasource):
         self._cursor.execute('''create index if not exists daily_hash_idx
             on daily_hash (
             date
+            )
+            ''')
+        self._cursor.execute('''create index if not exists group_idx
+            on pkgnames (
+            same_template
             )
             ''')
 
