@@ -21,7 +21,7 @@ from collections import Counter, namedtuple
 # above makes lines too long, so noqa
 import tenjin.helpers  # pylint: disable=import-error
 from humanize import naturalsize
-from tenjin import MemoryCacheStorage, SafeEngine
+from tenjin import MemoryCacheStorage, SafeEngine, SafePreprocessor
 from tenjin.escaped import as_escaped, to_escaped  # noqa, pylint: disable=import-error
 from tenjin.helpers import echo, to_str  # noqa, pylint: disable=unused-import,import-error
 
@@ -34,6 +34,17 @@ _CACHED_LOADER = None
 
 
 Area = namedtuple('Area', ('value', 'coords'))
+
+
+class CustomPreprocessor(SafePreprocessor):
+    def _localvars_assignments(self):
+        '''
+        Preprocessor calls _decode_params without defining it
+        '''
+        return (
+            super()._localvars_assignments()
+            + "_decode_params = tenjin.helpers._decode_params;"
+        )
 
 
 def escape(arg):
@@ -72,6 +83,8 @@ def _loader():
     if config.DEVEL_MODE or _CACHED_LOADER is None:
         _CACHED_LOADER = SafeEngine(
             path=['templates'],
+            preprocess=True,
+            preprocessorclass=CustomPreprocessor,
             cache=MemoryCacheStorage()
         )
     return _CACHED_LOADER

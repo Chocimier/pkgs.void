@@ -5,11 +5,11 @@
             <i>yet</i>.</p>
             <p>
                 <?py if other_archs: ?>
-                See <a href="${root_url}/package/${pkgname}">archs where ${pkgname} is available</a>.
+                See <a href="${{root_url}}/package/${pkgname}">archs where ${pkgname} is available</a>.
                 
                 <?py else: ?>
                 
-                <p>You can search for packages in-browser on page listing <a href="${root_url}/all">all templates</a>.</p>
+                <p>You can search for packages in-browser on page listing <a href="${{root_url}}/all">all templates</a>.</p>
                 <?py #endif ?>
             </p>
         </main>

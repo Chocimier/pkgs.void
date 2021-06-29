@@ -5,13 +5,13 @@
                     <?py echo('                        ') ?>
                         <?py for i in entry['packages']: ?>
 <li>
-                            <a href="${root_url}/package/${i}">${i}</a>
+                            <a href="${{root_url}}/package/${i}">${i}</a>
                         </li><?py
                         #endfor ?>
 
                     </{== tag ==}>
                     <?py if 'more' in entry: ?>
-                    <a href="${root_url}/${entry['address']}">${entry['more']}</a>
+                    <a href="${{root_url}}/${entry['address']}">${entry['more']}</a>
                     <?py #endif ?>
                 </div>
     

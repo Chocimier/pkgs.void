@@ -2,7 +2,7 @@
     <div class="content">
         <main>
             <h1>Find packages</h1>
-            <form action="${root_url}/search" method="GET">
+            <form action="${{root_url}}/search" method="GET">
                 <input type=text name=term value="{== escape_attr(term) ==}" class="form-control"/><br/>
                 <?py for f in fields: ?>
                 <label><input type="checkbox" name="by"${iff(f in checked, ' checked="checked"')} value="${f}"/> by ${f}</label><br/>
@@ -15,7 +15,7 @@
             <?py if packages: ?>
             <dl>
                 <?py for i in packages: ?>
-<dt><a href="${root_url}/package/${i['name']}">${i['name']}</a></dt>
+<dt><a href="${{root_url}}/package/${i['name']}">${i['name']}</a></dt>
 <dd>${i['description']}</dd>
             <?py #endfor ?>
             </dl>

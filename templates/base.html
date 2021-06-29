@@ -5,15 +5,15 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>${_context.get('title', 'Packages')} from Void</title>
-        <link rel="icon" type="image/png" href="${assets_url}/img/favicon.png" />
-        <link rel="stylesheet" href="${assets_url}/css/packages.css"/>
-        <link rel="stylesheet" href="${assets_url}/css/bootstrap.min.css">
-        <link rel="stylesheet" href="${assets_url}/css/screen.css">
-        <link rel="stylesheet" href="${assets_url}/css/misc.css">
-        <link href='${assets_url}/css/font-ubuntu.css' rel='stylesheet' type='text/css'>
-        <script src="${assets_url}/js/jquery.min.js"></script>
-        <script src="${assets_url}/js/bootstrap.min.js"></script>
-        <script src="${assets_url}/js/navbar.js"></script>
+        <link rel="icon" type="image/png" href="${{assets_url}}/img/favicon.png" />
+        <link rel="stylesheet" href="${{assets_url}}/css/packages.css"/>
+        <link rel="stylesheet" href="${{assets_url}}/css/bootstrap.min.css">
+        <link rel="stylesheet" href="${{assets_url}}/css/screen.css">
+        <link rel="stylesheet" href="${{assets_url}}/css/misc.css">
+        <link href='${{assets_url}}/css/font-ubuntu.css' rel='stylesheet' type='text/css'>
+        <script src="${{assets_url}}/js/jquery.min.js"></script>
+        <script src="${{assets_url}}/js/bootstrap.min.js"></script>
+        <script src="${{assets_url}}/js/navbar.js"></script>
     </head>
     <body>
         <header>
@@ -29,11 +29,11 @@
                     </div>
                     <div class="collapse navbar-right navbar-collapse" id="void-collapsed-navbar">
                         <ul class="nav navbar-nav continuous">
-                            <li><a href="${voidlinux_url}/">Home</a></li>
-                            <li><a href="${voidlinux_url}/news">News</a></li>
-                            <li><a href="${voidlinux_url}/download/">Download</a></li>
-                            <li><a href="${root_url}">Packages</a></li>
-                            <li><a href="${voidlinux_url}/acknowledgments/">Acknowledgments</a></li>
+                            <li><a href="${{voidlinux_url}}/">Home</a></li>
+                            <li><a href="${{voidlinux_url}}/news">News</a></li>
+                            <li><a href="${{voidlinux_url}}/download/">Download</a></li>
+                            <li><a href="${{root_url}}">Packages</a></li>
+                            <li><a href="${{voidlinux_url}}/acknowledgments/">Acknowledgments</a></li>
                             <li><a href="https://docs.voidlinux.org">Documentation</a></li>
                             <li><a href="https://man.voidlinux.org/">Manual pages</a></li>
                             <li><a href="https://github.com/void-linux">Github</a></li>
@@ -42,9 +42,9 @@
                 </div>
             </nav>
             <div class="searchbar">
-            <form action="${root_url}/search" method="GET" class="form-inline">
-                <a href="${root_url}">Featured packages</a>
-                <a href="${root_url}/all">All packages</a>
+            <form action="${{root_url}}/search" method="GET" class="form-inline">
+                <a href="${{root_url}}">Featured packages</a>
+                <a href="${{root_url}}/all">All packages</a>
                 <input name="term" type="text" class="form-control"/>
                 <input type="submit" value="View" class="btn btn-green"/>
                 <input type="submit" name="find" value="Find" class="btn btn-green"/>
