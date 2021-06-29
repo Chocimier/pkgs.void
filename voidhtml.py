@@ -94,6 +94,7 @@ def _relevant_props():
         },
         {
             'name': 'run_depends',
+            'parser': set,
             'islist': True
         },
     )
