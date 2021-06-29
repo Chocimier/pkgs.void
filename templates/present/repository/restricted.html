@@ -1,5 +1,5 @@
 
     None of public repositories. This package is restricted, i.e. needs to be
-    <a href="https://docs.voidlinux.org/xbps/repositories/restricted.html">build for oneself</a>${iff(isinstance(reason, str), f' for following reason: {reason}.',  ', because authors do not want us to bring ready for use package to you.')}
+    <a href="https://docs.voidlinux.org/xbps/repositories/restricted.html">build for oneself</a>{== f' for following reason: {_escape(reason)}.' if isinstance(reason, str) else ', because authors do not want us to bring ready for use package to you.' ==}
     
 

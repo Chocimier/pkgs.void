@@ -1,8 +1,9 @@
 <?py _context['title']=pkgname ?>
+<?py escaped_pkgname=_escape(pkgname) ?>
         <div class="content">
         <main>
             <div class="column">
-                 <h2>${pkgname}</h2>
+                 <h2>{== escaped_pkgname ==}</h2>
 				 <?py _context['param'] = short_desc ?>
                  <p><?py include('small/list_with_archs.html') ?></p>
                  
@@ -11,7 +12,7 @@
 					 <?py version=next(next(versions.by_iset).by_libc) ?>
                      <p>Build for ${version.data['iset']}-${version.data['libc']}, version
                      <strong>${version.version}<span class="revision"><span class="revision-separator">_</span>${version.revision}</span></strong>.
-                     <a href="${{root_url}}/package/${pkgname}">Builds for all architectures</a>.</p>
+                     <a href="${{root_url}}/package/{== escaped_pkgname ==}">Builds for all architectures</a>.</p>
                      <hr/>
                  
                  
@@ -21,8 +22,8 @@
 				 <div class="archs-per-version">
 				 <h4>Version ${verrev}</h4>
 					 <?py for idx, version in enumerate(archs): ?>
-					 <?py arch = '{iset}-{libc}'.format(**version.data) ?>
-					 ${iff(idx > 0, ' - ')}<a href="${{root_url}}/package/${pkgname}/${arch}">${arch}</a>
+					 <?py arch = _escape('{iset}-{libc}'.format(**version.data)) ?>
+					 {== ' - ' if idx > 0 else '' ==}<a href="${{root_url}}/package/{== escaped_pkgname ==}/{== arch ==}">{== arch ==}</a>
 					 <?py #endfor ?>
 				 </div>
 				 <?py #endfor ?>
@@ -62,7 +63,8 @@
             <ul class="continuous">
               
 			  <?py for subpkg in subpkgs: ?>
-              <li><a href="${{root_url}}/package/${subpkg}">${subpkg}</a></li>
+			  <?py escaped_subpkg = _escape(subpkg) ?>
+              <li><a href="${{root_url}}/package/{== escaped_subpkg ==}">{== escaped_subpkg ==}</a></li>
 			  <?py #endfor ?>
             </ul>
           </section>
@@ -71,7 +73,7 @@
 		  <?py #endif ?>
           <?py echo('            ') ?>
           <?py for template in sorted(mainpkg['pkgname'].value): ?>
-<a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template${f' ({template})' if len(mainpkg['pkgname'].value) > 1 else ''}</a><?py
+<a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${template}/template">Package template{== _escape(f' ({template})') if len(mainpkg['pkgname'].value) > 1 else '' ==}</a><?py
 		#endfor ?>
 
         </aside>

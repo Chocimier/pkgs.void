@@ -5,7 +5,8 @@
             <form action="${{root_url}}/search" method="GET">
                 <input type=text name=term value="{== escape_attr(term) ==}" class="form-control"/><br/>
                 <?py for f in fields: ?>
-                <label><input type="checkbox" name="by"${iff(f in checked, ' checked="checked"')} value="${f}"/> by ${f}</label><br/>
+                <?py escaped_field = _escape(f) ?>
+                <label><input type="checkbox" name="by"{== ' checked="checked"' if f in checked else '' ==} value="{== escaped_field ==}"/> by {== escaped_field ==}</label><br/>
                 <?py #endfor ?>
                 <input type="submit" name="find" value="Find" class="btn btn-green"/>
             </form>
@@ -15,7 +16,8 @@
             <?py if packages: ?>
             <dl>
                 <?py for i in packages: ?>
-<dt><a href="${{root_url}}/package/${i['name']}">${i['name']}</a></dt>
+                <?py escaped_name = _escape(i['name']) ?>
+<dt><a href="${{root_url}}/package/{== escaped_name ==}">{== escaped_name ==}</a></dt>
 <dd>${i['description']}</dd>
             <?py #endfor ?>
             </dl>

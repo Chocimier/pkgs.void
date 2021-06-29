@@ -1,14 +1,15 @@
+<?py escaped_pkgname = _escape(pkgname) ?>
         <div class="content">
         <main>
-            <p>There is no "${pkgname}" package
-            {== iff(other_archs, 'for this arch') ==}
+            <p>There is no "{== escaped_pkgname ==}" package
+            {== 'for this arch' if other_archs else '' ==}
             <i>yet</i>.</p>
             <p>
                 <?py if other_archs: ?>
-                See <a href="${{root_url}}/package/${pkgname}">archs where ${pkgname} is available</a>.
                 
+                See <a href="${{root_url}}/package/{== escaped_pkgname ==}">archs where {== escaped_pkgname ==} is available</a>.
                 <?py else: ?>
-                
+
                 <p>You can search for packages in-browser on page listing <a href="${{root_url}}/all">all templates</a>.</p>
                 <?py #endif ?>
             </p>

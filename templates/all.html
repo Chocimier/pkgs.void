@@ -4,7 +4,8 @@
             <h1>All packages</h1>
             <dl>
                 <?py for i in packages: ?>
-<dt><a href="./package/${i['pkgname']}">${i['pkgname']}</a></dt>
+                <?py escaped_pkgname=_escape(i['pkgname']) ?>
+<dt><a href="./package/{== escaped_pkgname ==}">{== escaped_pkgname ==}</a></dt>
 <dd>${i['short_desc']}</dd>
 <?py #endfor ?>
             </dl>

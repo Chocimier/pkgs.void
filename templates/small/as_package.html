@@ -1,2 +1,2 @@
 <?py for version, revision in pairs: ?>
-${version}{== iff(revision, f'<sub>{to_escaped(revision)}</sub>') ==}<?py #endfor ?>
+${version}{== f'<sub>{to_escaped(revision)}</sub>' if revision else '' ==}<?py #endfor ?>

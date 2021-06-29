@@ -27,7 +27,6 @@ from tenjin.helpers import echo, to_str  # noqa, pylint: disable=unused-import,i
 
 from custom_types import ValueAt
 from settings import config
-from sink import iff  # noqa, pylint: disable=unused-import
 
 
 _CACHED_LOADER = None

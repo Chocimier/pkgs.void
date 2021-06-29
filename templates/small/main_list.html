@@ -4,8 +4,9 @@
                     <{== tag ==}>
                     <?py echo('                        ') ?>
                         <?py for i in entry['packages']: ?>
+                        <?py escaped_pkgname=_escape(i) ?>
 <li>
-                            <a href="${{root_url}}/package/${i}">${i}</a>
+                            <a href="${{root_url}}/package/{== escaped_pkgname ==}">{== escaped_pkgname ==}</a>
                         </li><?py
                         #endfor ?>
 
@@ -14,4 +15,4 @@
                     <a href="${{root_url}}/${entry['address']}">${entry['more']}</a>
                     <?py #endif ?>
                 </div>
-    
+
