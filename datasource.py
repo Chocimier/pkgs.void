@@ -211,11 +211,16 @@ class Datasource(metaclass=abc.ABCMeta):
 
 
 class SqliteDataSource(Datasource):
-    def __init__(self, path):
+    def __init__(self, path, mode):
+        '''Opens datasource stored as sqlite database.
+        path: path of database file
+        mode: 'read' or 'write'
+        '''
         self._db = sqlite3.connect(path)
         self._cursor = self._db.cursor()
-        self._initialize()
-        self.metadata_interest = MetapackageInterest()
+        if mode == 'write':
+            self._initialize()
+            self.metadata_interest = MetapackageInterest()
 
     def _initialize(self):
         self._cursor.execute('''create table if not exists packages (
