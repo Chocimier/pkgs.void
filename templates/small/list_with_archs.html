@@ -5,6 +5,7 @@
 ${ param.presentation['formatter'](value.value)}
 {== f'<aside> [{to_escaped(masks)}]</aside></span>' if masks else '' ==}
 <?py else: ?>
+<ul>
 <?py for value in param.value: ?>
 <?py masks = masks_presenter(value.coords, param.presentation['space']) ?>
 <li>${ param.presentation['formatter'](value.value)}{== f'<aside> [{to_escaped(masks)}]</aside>' if masks else '' ==}</li>
