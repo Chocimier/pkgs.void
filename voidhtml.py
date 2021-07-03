@@ -245,13 +245,13 @@ def separate_fields(fields, separate):
     return separated
 
 
-def data_generator(pkgname, repos):
+def data_generator(pkgname, single):
     binpkgs = Binpkgs()
     source = datasource.factory()
     fields_dic = defaultdict(list)
     other_archs = False
     for row in source.read(pkgname=pkgname):
-        if row.arch not in repos:
+        if single and row.arch != single:
             other_archs = True
             continue
         pkg = make_pkg(row)
@@ -274,8 +274,8 @@ def data_generator(pkgname, repos):
     }, other_archs, next(source.auxiliary('popularity_reports')))
 
 
-def page_generator(pkgname, repos, single=False):
-    found = data_generator(pkgname, repos)
+def page_generator(pkgname, single=None):
+    found = data_generator(pkgname, single)
     parameters = found.parameters
     if not parameters:
         if not found.other:
@@ -458,7 +458,7 @@ def no_page():
 
 
 def main():
-    print(page_generator(sys.argv[1], sys.argv[2:]))
+    print(page_generator(sys.argv[1], sys.argv[2]))
 
 
 if __name__ == '__main__':

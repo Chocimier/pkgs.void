@@ -62,12 +62,12 @@ route('/package')(which_package)
 
 @route('/package/<pkgname>')
 def package(pkgname):
-    return page_generator(pkgname, repos=config.REPOS)
+    return page_generator(pkgname)
 
 
 @route('/package/<pkgname>/<iset>-<libc>')
 def package_arch(pkgname, iset, libc):
-    return page_generator(pkgname, repos=[join_arch(iset, libc)], single=True)
+    return page_generator(pkgname, single=join_arch(iset, libc))
 
 
 @route('/static/<filename:path>')

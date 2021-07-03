@@ -25,7 +25,6 @@ import gprof2dot
 
 sys.path.append('.')
 import voidhtml # noqa, pylint: disable=wrong-import-position
-from settings import config # noqa, pylint: disable=wrong-import-position
 
 
 _PROFILE = 'profile'
@@ -33,7 +32,7 @@ _TIMEIT = 'timeit'
 
 
 _CODE_MAP = {
-    "gcc": "voidhtml.page_generator('gcc', config.REPOS)",
+    "gcc": "voidhtml.page_generator('gcc')",
     "main": "voidhtml.main_page()",
     "newest": "voidhtml.newest()",
     "of_day": "voidhtml.of_day()",
@@ -48,14 +47,14 @@ def is_func(constant, variable):
 
 
 def _heat_up():
-    voidhtml.page_generator('gcc', config.REPOS)
+    voidhtml.page_generator('gcc')
     voidhtml.newest()
 
 
 def _timeit_run(name, code):
     time = timeit.timeit(
         code,
-        setup="import voidhtml; from settings import config",
+        setup="import voidhtml",
         number=1000
     )
     print(f'{name}: {time}s')
