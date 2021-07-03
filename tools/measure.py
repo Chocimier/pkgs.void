@@ -24,7 +24,7 @@ import timeit
 import gprof2dot
 
 sys.path.append('.')
-import voidhtml # noqa, pylint: disable=wrong-import-position
+import voidhtml # noqa, pylint: disable=wrong-import-position,unused-import
 
 
 _PROFILE = 'profile'
@@ -44,11 +44,6 @@ _CODE_MAP = {
 
 def is_func(constant, variable):
     return variable is None or variable == constant
-
-
-def _heat_up():
-    voidhtml.page_generator('gcc')
-    voidhtml.newest()
 
 
 def _timeit_run(name, code):
@@ -93,7 +88,6 @@ def _profile(func):
 
 
 def main(mode=None, func=None):
-    _heat_up()
     if is_func(_PROFILE, mode):
         _profile(func)
     if is_func(_TIMEIT, mode):
