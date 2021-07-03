@@ -453,6 +453,10 @@ def lists_index():
     return present.render_template('toc.html')
 
 
+def no_page():
+    return present.render_template('nopage.html')
+
+
 def main():
     print(page_generator(sys.argv[1], sys.argv[2:]))
 

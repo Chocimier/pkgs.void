@@ -25,7 +25,7 @@ from bottle import request, route, run, server_names, static_file
 from settings import config
 from voidhtml import (
     find, lists_index, longest_names, main_page, metapackages,
-    newest, of_day, page_generator, popular, which_package
+    newest, no_page, of_day, page_generator, popular, which_package
 )
 from xbps import join_arch
 
@@ -78,7 +78,7 @@ def static(filename):
 @error(404)
 def error404(err):
     del err
-    return 'Nothing here, sorry'
+    return no_page()
 
 
 class UrlPrefixMiddleware():
