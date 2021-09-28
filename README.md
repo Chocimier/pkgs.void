@@ -21,3 +21,7 @@ Web catalog of Void Linux packages.
 6. Run: `./serve.py`
 
 There is a CGI script `cgi.sh` and FCGI script: `fcgi.sh`.
+
+# Configuration:
+
+Settings in `config.ini`, if any, overrride setttings in `configs/defaults.ini`
