@@ -39,6 +39,8 @@ _CODE_MAP = {
     "popular": "voidhtml.popular()",
     "sets": "voidhtml.metapackages()",
     "longest": "voidhtml.longest_names()",
+    "find": "voidhtml.find('void', [])",
+    "find-nothing": "voidhtml.find('sgzfalcoxjvfmpgrme', [])",
 }
 
 
