@@ -27,6 +27,10 @@ dir="$(basename "$path")"
 cd $path || exit 1
 . venv/bin/activate
 
+logfile="$PWD/data/log"
+mkdir -p "$(dirname "$logfile")"
+echo "$(date -Iseconds)" UPDATING BEGINS >> "$logfile"
+
 while true
 do
     case "$1" in
@@ -44,6 +48,8 @@ mirror="$(./settings.py REPODATA_MIRROR)"
 rsyncmirror="$(./settings.py RSYNC_MIRROR)"
 popcornmirror="$(./settings.py POPCORN_MIRROR)"
 generated="$(./settings.py GENERATED_FILES_PATH)"
+
+echo "$(date -Iseconds)" publishing code >> "$logfile"
 mkdir -p "$generated"
 cd .. || exit 1
 tar cjf "$dir/$generated/tmp.tar.bz2" --exclude-ignore tar-exclude "$dir" || exit 1
@@ -52,6 +58,7 @@ mv "$generated"/tmp.tar.bz2 "$generated"/pkgs.void.tar.bz2 || exit 1
 
 if [ "$templates" ]
 then
+    echo "$(date -Iseconds)" fetching templates >> "$logfile"
     : "${XBPS_DISTDIR:=$(xdistdir)}"
     : "${XBPS_DISTDIR:?}"
     (cd "$XBPS_DISTDIR" || exit $?
@@ -63,6 +70,7 @@ then
     ) || exit $?
 fi
 
+echo "$(date -Iseconds)" fetching repodata >> "$logfile"
 mkdir -p data
 cd data || exit 1
 
@@ -85,6 +93,7 @@ for path in $repos; do
 	tar xf "$filename" -C "$extract_dir"
 done
 
+echo "$(date -Iseconds)" listing package create date >> "$logfile"
 for path in $repos; do
 	echo "$(cd ..; ./repopaths.py rsync_path "$path")"
 done | sort -u | while read dir; do
@@ -92,7 +101,9 @@ done | sort -u | while read dir; do
 	[ "$download" ] && rsync --list-only "${rsyncmirror}${dir}" --include '*.xbps' --exclude='*' > "${filename}"
 done
 
+echo "$(date -Iseconds)" fetching updates >> "$logfile"
 [ "$download" ] && [ "$updates" ] && wget -q -O void-updates.txt "$mirror/void-updates/void-updates.txt"
+echo "$(date -Iseconds)" fetching popcorn >> "$logfile"
 [ "$download" ] && [ "$popularity" ] &&
   wget -q -O popcorn.today.json "$popcornmirror/popcorn_$(date +%Y-%m-%d).json" &&
   mv popcorn.today.json popcorn.json
@@ -100,12 +111,19 @@ done
 cd .. || exit 1
 
 rm -f newindex.sqlite3
+echo "$(date -Iseconds)" parsing repodata >> "$logfile"
 ./builddb.py $repos
+echo "$(date -Iseconds)" parsing templates >> "$logfile"
 [ "$templates" ] && ./dbfromrepo.py $repos
+echo "$(date -Iseconds)" parsing updates >> "$logfile"
 [ "$updates" ] && ./updates.py $repos
+echo "$(date -Iseconds)" parsing popcorn >> "$logfile"
 [ "$popularity" ] && ./popularity.py
+echo "$(date -Iseconds)" parsing package create date >> "$logfile"
 ./rsyncdata.py $repos
 
 mv newindex.sqlite3 index.sqlite3
 
+echo "$(date -Iseconds)" generating static pages >> "$logfile"
 python -c 'import voidhtml; print(voidhtml.list_all())' > "$generated"/all.html
+echo "$(date -Iseconds) update done" >> "$logfile"
