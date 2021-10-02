@@ -53,7 +53,8 @@ mv "$generated"/tmp.tar.bz2 "$generated"/pkgs.void.tar.bz2 || exit 1
 if [ "$templates" ]
 then
     : "${XBPS_DISTDIR:=$(xdistdir)}"
-    ( cd "$XBPS_DISTDIR" || exit $?
+    : "${XBPS_DISTDIR:?}"
+    (cd "$XBPS_DISTDIR" || exit $?
     if [ "$download" ]
     then
         git fetch -q origin || exit $?
