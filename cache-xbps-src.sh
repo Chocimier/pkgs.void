@@ -49,6 +49,7 @@ generate() {
 	if [ -e "$opdir/pkg/$pkg" ] ; then
 		return
 	fi
+	echo "$(date -Iseconds) generating $pkg" >> "$logfile"
 	if [ -h "srcpkgs/$pkg" ]; then
 		mainpkg="$(basename "$(realpath "srcpkgs/$pkg")")"
 		mainpkgdir="$opdir/subpkg/$mainpkg"
@@ -71,6 +72,7 @@ remove() {
 	pkg="${1:?}"
 	mainpkg=$(basename "$(find "$opdir/subpkg" -type f -name "$pkg" -exec basename '{}' ';')")
 	: "${mainpkg:=$pkg}"
+	echo "$(date -Iseconds) removing data of $mainpkg ($pkg)" >> "$logfile"
 	rm -rf "${opdir:?}/pkg/${mainpkg:?}" "${opdir:?}/subpkg/${mainpkg:?}"
 }
 
@@ -91,8 +93,9 @@ copy_cache() {
 main() {
 	argdir="$1"
 	validity="$2"
-	if [ -z "$argdir" ] || [ -z "$validity" ]; then
-		echo "Usage:	$0 cachedir validity"
+	logfile="$3"
+	if [ -z "$argdir" ] || [ -z "$validity" ] || [ -z "$logfile" ]; then
+		echo "Usage:	$0 cachedir validity logfile"
 		exit 1
 	fi
 
@@ -100,6 +103,7 @@ main() {
 	cd "$argdir" || exit 1
 	cachedir="$(pwd)" || exit 1
 	opdir="$cachedir/tmp" || exit 1
+	echo "$(date -Iseconds) parsing templates into $cachedir begins" >> "$logfile"
 	[ -e "$opdir" ] && rm -r "$opdir"
 
 	cd "$(xdistdir)" || exit 1
@@ -110,6 +114,7 @@ main() {
 	: "${times_used:=0}"
 
 	if [ "$times_used" -lt "$validity" ] && [ -d "$cachedir/complete" ] && [ -s "$cachedir/complete/meta/revision" ]; then
+		echo "$(date -Iseconds)" trying to reuse cache >> "$logfile"
 		use_old=1
 		old_revision=$(cat "$cachedir/complete/meta/revision")
 		git diff "$old_revision" --name-only | while read -r path; do
@@ -120,11 +125,13 @@ main() {
 				.github/*) ;;
 				*.md) ;;
 				*)
+					echo "$(date -Iseconds) dropping cache due to change of $path" >> "$logfile"
 					use_old=
 					;;
 			esac
 		done
 	else
+		echo "$(date -Iseconds)" not trying to reuse cache >> "$logfile"
 		use_old=
 	fi
 

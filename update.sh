@@ -116,7 +116,7 @@ echo "$(date -Iseconds)" parsing repodata >> "$logfile"
 ./builddb.py $repos
 if [ "$templates" ]; then
 	echo "$(date -Iseconds)" parsing templates >> "$logfile"
-	./cache-xbps-src.sh data/parsedtemplates $templates_cache_validity
+	./cache-xbps-src.sh data/parsedtemplates "$templates_cache_validity" "$logfile"
 	echo "$(date -Iseconds)" parsing template data >> "$logfile"
 	./dbfromrepo.py $repos
 fi
