@@ -113,8 +113,12 @@ cd .. || exit 1
 rm -f newindex.sqlite3
 echo "$(date -Iseconds)" parsing repodata >> "$logfile"
 ./builddb.py $repos
-echo "$(date -Iseconds)" parsing templates >> "$logfile"
-[ "$templates" ] && ./dbfromrepo.py $repos
+if [ "$templates" ]; then
+	echo "$(date -Iseconds)" parsing templates >> "$logfile"
+	./cache-xbps-src.sh data/parsedtemplates
+	echo "$(date -Iseconds)" parsing template data >> "$logfile"
+	./dbfromrepo.py $repos
+fi
 echo "$(date -Iseconds)" parsing updates >> "$logfile"
 [ "$updates" ] && ./updates.py $repos
 echo "$(date -Iseconds)" parsing popcorn >> "$logfile"

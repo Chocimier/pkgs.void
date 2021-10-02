@@ -16,7 +16,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import subprocess
 import sys
 from collections import defaultdict
 from datetime import timedelta
@@ -51,16 +50,9 @@ _SINGLE_VALUE_FIELDS = {
 def templatedata(pkgname, arch):
     del arch
     result = defaultdict(list)
-    try:
-        xbps_src = subprocess.run(
-            [DISTDIR + '/xbps-src', 'show', '-p', 'restricted*', pkgname],
-            check=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL
-        )
-    except subprocess.CalledProcessError:
-        return result
-    lines = xbps_src.stdout.decode('utf-8').split('\n')
+    filepath = f'data/parsedtemplates/complete/pkg/{pkgname}'
+    with open(filepath) as xbps_src_show:
+        lines = xbps_src_show.read().split('\n')
     for line in lines:
         try:
             field, value = line.split(':', 1)
