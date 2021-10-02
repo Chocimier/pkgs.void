@@ -90,8 +90,9 @@ copy_cache() {
 
 main() {
 	argdir="$1"
-	if [ -z "$argdir" ]; then
-		echo "Usage:	$0 cachedir"
+	validity="$2"
+	if [ -z "$argdir" ] || [ -z "$validity" ]; then
+		echo "Usage:	$0 cachedir validity"
 		exit 1
 	fi
 
@@ -103,9 +104,13 @@ main() {
 
 	cd "$(xdistdir)" || exit 1
 
-	use_old=1
+	if [ -s "$cachedir/complete/meta/times_used" ]; then
+		times_used=$(cat "$cachedir/complete/meta/times_used")
+	fi
+	: "${times_used:=0}"
 
-	if [ -d "$cachedir/complete" ] && [ -s "$cachedir/complete/meta/revision" ]; then
+	if [ "$times_used" -lt "$validity" ] && [ -d "$cachedir/complete" ] && [ -s "$cachedir/complete/meta/revision" ]; then
+		use_old=1
 		old_revision=$(cat "$cachedir/complete/meta/revision")
 		git diff "$old_revision" --name-only | while read -r path; do
 			case "$path" in
@@ -135,8 +140,10 @@ main() {
 			esac
 		done
 		clean_broken_files
+		echo $((times_used + 1)) > "$opdir/meta/times_used"
 	else
 		init_storage
+		echo 1 > "$opdir/meta/times_used"
 	fi
 	generate_all
 

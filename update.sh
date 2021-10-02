@@ -48,6 +48,7 @@ mirror="$(./settings.py REPODATA_MIRROR)"
 rsyncmirror="$(./settings.py RSYNC_MIRROR)"
 popcornmirror="$(./settings.py POPCORN_MIRROR)"
 generated="$(./settings.py GENERATED_FILES_PATH)"
+templates_cache_validity="$(./settings.py TEMPLATES_CACHE_VALIDITY)"
 
 echo "$(date -Iseconds)" publishing code >> "$logfile"
 mkdir -p "$generated"
@@ -115,7 +116,7 @@ echo "$(date -Iseconds)" parsing repodata >> "$logfile"
 ./builddb.py $repos
 if [ "$templates" ]; then
 	echo "$(date -Iseconds)" parsing templates >> "$logfile"
-	./cache-xbps-src.sh data/parsedtemplates
+	./cache-xbps-src.sh data/parsedtemplates $templates_cache_validity
 	echo "$(date -Iseconds)" parsing template data >> "$logfile"
 	./dbfromrepo.py $repos
 fi
