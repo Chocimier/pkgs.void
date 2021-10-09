@@ -55,17 +55,17 @@ generate() {
 		mainpkgdir="$opdir/subpkg/$mainpkg"
 		mkdir -p "$mainpkgdir"
 		# output for subpackages is wrong and ignored anyway
-		: ./xbps-src show -p 'restricted*' "$pkg" > "$mainpkgdir/$pkg"
-		ln -sr "$mainpkgdir/$pkg" "$opdir/pkg/$pkg"
+		: > "$mainpkgdir/$pkg"
+		ln -sr "$mainpkgdir/$pkg" "$opdir/pkg/$pkg" > /dev/null
 	else
-		./xbps-src show -p 'restricted*' "$pkg" > "$opdir/pkg/$pkg"
+		echo $pkg
 	fi
 }
 
 generate_all() {
 	for i in srcpkgs/*; do
 		generate "$(basename "$i")"
-	done
+	done | env XBPS_MASS_DUMP_DIR="$opdir/pkg" ./xbps-src show-mass -p 'restricted*'
 }
 
 remove() {
