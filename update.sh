@@ -18,7 +18,7 @@
 # This script updates packages database and published source tarball.
 
 download=yes
-templates=yes
+templates=
 updates=
 popularity=yes
 
@@ -63,11 +63,16 @@ then
     : "${XBPS_DISTDIR:=$(xdistdir)}"
     : "${XBPS_DISTDIR:?}"
     (cd "$XBPS_DISTDIR" || exit $?
+    git checkout -q xbps-src-p || exit $?
     if [ "$download" ]
     then
-        git fetch -q origin || exit $?
+        git fetch xbps-src-p -q &&
+        git checkout --detach -q &&
+        git branch -f xbps-src-p xbps-src-p/xbps-src-p -q &&
+        git checkout -q xbps-src-p &&
+        git fetch -q origin &&
+        git rebase -q origin/master || exit $?
     fi
-    git checkout -q origin/master || exit $?
     ) || exit $?
 fi
 
