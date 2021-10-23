@@ -74,6 +74,11 @@ class Binpkgs:
         for version in self._data.values():
             yield version
 
+    @property
+    def items(self):
+        for item in self._data.items():
+            yield item
+
 
 Field = namedtuple('Field', ('name', 'title', 'value', 'presentation'))
 
