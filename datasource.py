@@ -277,7 +277,7 @@ class SqliteDataSource(Datasource):
         Computes if it is daily package, and register if so.'''
         query = 'INSERT INTO packages ({}) VALUES ({})'.format(
             ', '.join(PackageRow._fields),
-            ', '.join('?' * len(package_row))
+            ', '.join('?' * len(PackageRow._fields))
         )
         self._cursor.execute(query, package_row)
         self._add_search_terms(package_row)
