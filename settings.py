@@ -21,12 +21,15 @@ import sys
 from custom_types import Attributes
 
 
-def load_config():
+DEFAULT_SECTION = 'common'
+
+
+def load_config(section=DEFAULT_SECTION):
     parser = configparser.ConfigParser(
         delimiters=('=',),
         comment_prefixes=('#',),
         empty_lines_in_values=False,
-        default_section='common',
+        default_section=section,
         interpolation=None,
     )
     parser.optionxform = lambda x: x
@@ -34,13 +37,14 @@ def load_config():
         parser.read_file(defaults)
     parser.read(('config.ini',))
     values = Attributes(parser[parser.default_section])
-    convert_types(values)
+    convert_types(values, section)
     return values
 
 
-def convert_types(values):
-    values.DEVEL_MODE = (values.DEVEL_MODE == 'yes')
-    values.DAILY_HASH_BITS = int(values.DAILY_HASH_BITS)
+def convert_types(values, section):
+    if section == 'common':
+        values.DEVEL_MODE = (values.DEVEL_MODE == 'yes')
+        values.DAILY_HASH_BITS = int(values.DAILY_HASH_BITS)
 
 
 def usage(script_name, bad_command=None):
