@@ -45,6 +45,9 @@ def convert_types(values, section):
     if section == 'common':
         values.DEVEL_MODE = (values.DEVEL_MODE == 'yes')
         values.DAILY_HASH_BITS = int(values.DAILY_HASH_BITS)
+    if section == 'buildlog':
+        values.PERIODIC_SCRAP_PERIOD = int(values.PERIODIC_SCRAP_PERIOD)
+        values.PERIODIC_SCRAP_COUNT = int(values.PERIODIC_SCRAP_COUNT)
 
 
 def usage(script_name, bad_command=None, config_arg=None):

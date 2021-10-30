@@ -166,3 +166,23 @@ def known_log(pkgver, arch, datasource):
     for package in datasource.read(pkgver=pkgver, arch=arch, state=CONFIRMED):
         return config.LOG_URL.format(arch=arch, number=package.batchnumber)
     return None
+
+
+@app.task()
+def scrap_few_random():
+    datasource = factory()
+    arch_list = list(datasource.random_arch())
+    if not arch_list:
+        return
+    arch = arch_list[0]
+    numbers = datasource.unfetched_builds(arch, config.PERIODIC_SCRAP_COUNT)
+    for number in numbers:
+        scrap_batch.delay(arch, number)
+
+
+@app.on_after_configure.connect
+def _setup_periodic_tasks(sender, **kwargs):
+    del kwargs
+    period = config.PERIODIC_SCRAP_PERIOD
+    sender.add_periodic_task(10 * period, scrap_max_batchnumbers.s())
+    sender.add_periodic_task(period, scrap_few_random.s())

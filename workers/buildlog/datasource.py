@@ -110,6 +110,10 @@ class Datasource(metaclass=abc.ABCMeta):
     def unfetched_builds(self, arch, count):
         '''Returns numbers of not fetched packages.'''
 
+    @abc.abstractmethod
+    def random_arch(self):
+        '''Returns iterable of one random known arch builder, if any.'''
+
 
 class SqliteDataSource(Datasource):
     def __init__(self, path, mode):
@@ -205,6 +209,13 @@ class SqliteDataSource(Datasource):
             ORDER BY batchnumber DESC
             LIMIT :count'''
         self._cursor.execute(query, {'arch': arch, 'count': count})
+        return (i[0] for i in self._cursor.fetchall())
+
+    def random_arch(self):
+        query = '''SELECT arch FROM maximal_batch
+            ORDER BY random()
+            LIMIT 1'''
+        self._cursor.execute(query, [])
         return (i[0] for i in self._cursor.fetchall())
 
 
