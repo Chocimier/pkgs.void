@@ -38,13 +38,11 @@ app = Celery(__name__, broker=config.BROKER)
 
 
 @app.task()
-def scrap_batch(arch, number=None):
+def scrap_batch(arch, number):
     update(lambda datasource: _scrap_batch(arch, number, datasource))
 
 
 def _scrap_batch(arch, number, datasource):
-    if not number:
-        number = next(datasource.unfetched_builds(arch, 1))
     raw_data = fetch_batch(arch, number)
     data = json.loads(raw_data)[str(number)]
     parse_batch(data, arch, number, datasource)
