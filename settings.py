@@ -47,28 +47,32 @@ def convert_types(values, section):
         values.DAILY_HASH_BITS = int(values.DAILY_HASH_BITS)
 
 
-def usage(script_name, bad_command=None):
+def usage(script_name, bad_command=None, config_arg=None):
     def show(string):
         print(string, file=sys.stderr)
-    show(f'usage: {script_name} key')
+    show(f'usage: {script_name} key [section]')
     if bad_command is not None:
         show(f'"{bad_command}" is not defined key')
     show('Defined keys:')
-    for key in dir(config):
+    for key in dir(config_arg):
         if not key.startswith('_'):
             show(f'  {key}')
 
 
 def main(*args):
-    try:
+    if len(args) == 2:
         script_name, key = args
-    except ValueError:
-        usage(args[0])
+        config_for_print = config
+    elif len(args) == 3:
+        script_name, key, section = args
+        config_for_print = load_config(section)
+    else:
+        usage(args[0], config_arg=config)
         sys.exit(1)
     try:
-        value = getattr(config, key)
+        value = getattr(config_for_print, key)
     except AttributeError:
-        usage(script_name, key)
+        usage(script_name, key, config_for_print)
         sys.exit(1)
     print(value)
 
