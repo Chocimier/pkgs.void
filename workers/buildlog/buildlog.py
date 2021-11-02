@@ -18,6 +18,7 @@ import math
 from urllib.request import urlopen
 
 from celery import Celery
+from celery.utils.log import get_task_logger
 
 import xbps
 from settings import load_config
@@ -35,11 +36,14 @@ COMMIT_UPDATE = ': update to '
 
 config = load_config('buildlog')
 app = Celery(__name__, broker=config.BROKER)
+logger = get_task_logger(__name__)
 
 
 @app.task()
 def scrap_batches(arch, numbers):
     numbers = list(numbers)
+    numbers_formatted = ', '.join(str(i) for i in numbers)
+    logger.info('scraping %s batches number %s', arch, numbers_formatted)
     update(lambda datasource: _scrap_batches(arch, numbers, datasource))
 
 
@@ -55,6 +59,7 @@ def fetch_batches(arch, numbers):
     url = config.BATCHES_URL.format(arch=arch)
     for number in numbers:
         url += config.BATCHES_URL_NUMBER_PARAM.format(number=number)
+    logger.info('fetching from %s', url)
     with urlopen(url) as response:
         return response.read()
 
@@ -65,7 +70,10 @@ def guess_pkgver(message):
         parts = subject.partition(COMMIT_UPDATE)
         pkgname = parts[0]
         version = parts[2].split()[0].removesuffix('.')
-        return pkgname, f'{pkgname}-{version}_1'
+        pkgver = f'{pkgname}-{version}_1'
+        logger.info('guessing %s from subject %s', pkgver, repr(subject))
+        return pkgname, pkgver
+    logger.info('guessing nothing from subject %s', repr(subject))
     return None, None
 
 
@@ -158,12 +166,14 @@ def scrap_max_batchnumbers():
 
 def _scrap_max_batchnumbers(datasource):
     url = config.BUILDERS_URL
+    logger.info('fetching newest batches numbers from %s', url)
     with urlopen(url) as response:
         raw_data = response.read()
     data = json.loads(raw_data)
     for builder_name, builder_data in data.items():
         arch = builder_name.removesuffix(BUILDER_NAME_SUFFIX)
         max_number = max(builder_data['cachedBuilds'], default=0)
+        logger.info('found %s for %s', max_number, arch)
         datasource.set_max_batch(arch, str(max_number))
 
 
@@ -180,7 +190,8 @@ def scrap_few_random():
     if not arch_list:
         return
     arch = arch_list[0]
-    numbers = list(datasource.unfetched_builds(arch, config.PERIODIC_SCRAP_COUNT))
+    count = config.PERIODIC_SCRAP_COUNT
+    numbers = list(datasource.unfetched_builds(arch, count))
     scrap_batches.delay(arch, numbers)
 
 
