@@ -38,19 +38,23 @@ app = Celery(__name__, broker=config.BROKER)
 
 
 @app.task()
-def scrap_batch(arch, number):
-    update(lambda datasource: _scrap_batch(arch, number, datasource))
+def scrap_batches(arch, numbers):
+    numbers = list(numbers)
+    update(lambda datasource: _scrap_batches(arch, numbers, datasource))
 
 
-def _scrap_batch(arch, number, datasource):
-    raw_data = fetch_batch(arch, number)
-    data = json.loads(raw_data)[str(number)]
-    parse_batch(data, arch, number, datasource)
-    datasource.create_batch(Batch(arch, number, CONFIRMED))
+def _scrap_batches(arch, numbers, datasource):
+    raw_data = fetch_batches(arch, numbers)
+    data = json.loads(raw_data)
+    for batch_data in data.values():
+        batch = parse_batch(batch_data, datasource)
+        datasource.create_batch(batch)
 
 
-def fetch_batch(arch, number):
-    url = config.RUN_URL.format(arch=arch, number=number)
+def fetch_batches(arch, numbers):
+    url = config.BATCHES_URL.format(arch=arch)
+    for number in numbers:
+        url += config.BATCHES_URL_NUMBER_PARAM.format(number=number)
     with urlopen(url) as response:
         return response.read()
 
@@ -65,7 +69,9 @@ def guess_pkgver(message):
     return None, None
 
 
-def parse_batch(data, arch, number, datasource):
+def parse_batch(data, datasource):
+    arch = data['builderName'].removesuffix(BUILDER_NAME_SUFFIX)
+    number = data['number']
     packages = []
     pkgver_dict = {}
     for step in data.get('steps', []):
@@ -89,6 +95,7 @@ def parse_batch(data, arch, number, datasource):
             batchnumber=number,
             state=GUESS)
         datasource.create(package)
+    return Batch(arch, number, CONFIRMED)
 
 
 @app.task()
@@ -97,7 +104,7 @@ def scrap_log(arch, number):
 
 
 def _scrap_log(arch, number, datasource):
-    url = config.LOG_URL.format(arch=arch, number=number)
+    url = config.PACKAGE_URL.format(arch=arch, number=number)
     print('scraping', url)
     with urlopen(url) as response:
         datasource.delete(batchnumber=number)
@@ -162,7 +169,7 @@ def _scrap_max_batchnumbers(datasource):
 
 def known_log(pkgver, arch, datasource):
     for package in datasource.read(pkgver=pkgver, arch=arch, state=CONFIRMED):
-        return config.LOG_URL.format(arch=arch, number=package.batchnumber)
+        return config.PACKAGE_URL.format(arch=arch, number=package.batchnumber)
     return None
 
 
@@ -173,9 +180,8 @@ def scrap_few_random():
     if not arch_list:
         return
     arch = arch_list[0]
-    numbers = datasource.unfetched_builds(arch, config.PERIODIC_SCRAP_COUNT)
-    for number in numbers:
-        scrap_batch.delay(arch, number)
+    numbers = list(datasource.unfetched_builds(arch, config.PERIODIC_SCRAP_COUNT))
+    scrap_batches.delay(arch, numbers)
 
 
 @app.on_after_configure.connect
