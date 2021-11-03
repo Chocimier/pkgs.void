@@ -2,7 +2,7 @@
 
 ret=0
 
-pylint --rcfile .pylint *.py tools workers || ret=1
+pylint --rcfile .pylint --jobs 0 *.py tools workers || ret=1
 flake8 --exclude venv || ret=1
 
 exit $ret
