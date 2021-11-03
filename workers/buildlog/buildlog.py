@@ -22,6 +22,7 @@ from celery.utils.log import get_task_logger
 
 import xbps
 from settings import load_config
+from sink import removeprefix, removesuffix
 from workers.buildlog.datasource import (
     ERROR, CONFIRMED, GUESS, Batch, Package, factory, update
 )
@@ -69,7 +70,7 @@ def guess_pkgver(message):
     if COMMIT_UPDATE in subject:
         parts = subject.partition(COMMIT_UPDATE)
         pkgname = parts[0]
-        version = parts[2].split()[0].removesuffix('.')
+        version = parts[2].split()[0].rstrip('.')
         pkgver = f'{pkgname}-{version}_1'
         logger.info('guessing %s from subject %s', pkgver, repr(subject))
         return pkgname, pkgver
@@ -80,7 +81,7 @@ def guess_pkgver(message):
 def parse_batch(data, arch, number, datasource):
     if 'error' in data:
         return Batch(arch, number, ERROR)
-    arch = data['builderName'].removesuffix(BUILDER_NAME_SUFFIX)
+    arch = removesuffix(data['builderName'], BUILDER_NAME_SUFFIX)
     number = data['number']
     packages = []
     pkgver_dict = {}
@@ -90,7 +91,7 @@ def parse_batch(data, arch, number, datasource):
             continue
         text = text_list[0]
         if text.startswith(BATCH_MARK):
-            packages = text.removeprefix(BATCH_MARK).split(' ')
+            packages = removeprefix(text, BATCH_MARK).split(' ')
     for change in data['sourceStamps'][0]['changes']:
         pkgname, pkgver = guess_pkgver(change['comments'])
         if pkgver:
@@ -173,7 +174,7 @@ def _scrap_max_batchnumbers(datasource):
         raw_data = response.read()
     data = json.loads(raw_data)
     for builder_name, builder_data in data.items():
-        arch = builder_name.removesuffix(BUILDER_NAME_SUFFIX)
+        arch = removesuffix(builder_name, BUILDER_NAME_SUFFIX)
         max_number = max(builder_data['cachedBuilds'], default=0)
         logger.info('found %s for %s', max_number, arch)
         datasource.set_max_batch(arch, str(max_number))

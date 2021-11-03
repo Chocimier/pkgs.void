@@ -17,6 +17,20 @@
 import datetime
 
 
+def removeprefix(string, prefix):
+    '''from PEP 616'''
+    if string.startswith(prefix):
+        return string[len(prefix):]
+    return string
+
+
+def removesuffix(string, suffix):
+    '''from PEP 616'''
+    if suffix and string.endswith(suffix):
+        return string[:-len(suffix)]
+    return string
+
+
 def same(arg):
     return arg
 
