@@ -23,7 +23,7 @@ from celery.utils.log import get_task_logger
 import xbps
 from settings import load_config
 from workers.buildlog.datasource import (
-    CONFIRMED, GUESS, Batch, Package, factory, update
+    ERROR, CONFIRMED, GUESS, Batch, Package, factory, update
 )
 
 
@@ -50,8 +50,8 @@ def scrap_batches(arch, numbers):
 def _scrap_batches(arch, numbers, datasource):
     raw_data = fetch_batches(arch, numbers)
     data = json.loads(raw_data)
-    for batch_data in data.values():
-        batch = parse_batch(batch_data, datasource)
+    for number, batch_data in data.items():
+        batch = parse_batch(batch_data, arch, number, datasource)
         datasource.create_batch(batch)
 
 
@@ -77,7 +77,9 @@ def guess_pkgver(message):
     return None, None
 
 
-def parse_batch(data, datasource):
+def parse_batch(data, arch, number, datasource):
+    if 'error' in data:
+        return Batch(arch, number, ERROR)
     arch = data['builderName'].removesuffix(BUILDER_NAME_SUFFIX)
     number = data['number']
     packages = []

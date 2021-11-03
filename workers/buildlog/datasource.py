@@ -23,6 +23,7 @@ config = load_config('buildlog')
 
 
 CONFIRMED = 'confirmed'
+ERROR = 'error'
 GUESS = 'guess'
 
 
