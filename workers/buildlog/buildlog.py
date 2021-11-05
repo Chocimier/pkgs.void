@@ -43,12 +43,16 @@ logger = get_task_logger(__name__)
 @app.task()
 def scrap_batches(arch, numbers):
     numbers = list(numbers)
+    if not numbers:
+        return
     numbers_formatted = ', '.join(str(i) for i in numbers)
     logger.info('scraping %s batches number %s', arch, numbers_formatted)
     update(lambda datasource: _scrap_batches(arch, numbers, datasource))
 
 
 def _scrap_batches(arch, numbers, datasource):
+    if not numbers:
+        return
     raw_data = fetch_batches(arch, numbers)
     data = json.loads(raw_data)
     for number, batch_data in data.items():
@@ -57,6 +61,8 @@ def _scrap_batches(arch, numbers, datasource):
 
 
 def fetch_batches(arch, numbers):
+    if not numbers:
+        return '{}'
     url = config.BATCHES_URL.format(arch=arch)
     for number in numbers:
         url += config.BATCHES_URL_NUMBER_PARAM.format(number=number)
