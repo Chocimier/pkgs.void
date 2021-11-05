@@ -34,7 +34,7 @@ def search():  # pylint: disable=inconsistent-return-statements
     term = request.query.get('term')  # pylint: disable=no-member
     finding = request.query.get('find')  # pylint: disable=no-member
     fields = request.query.getall('by')  # pylint: disable=no-member
-    if finding or fields:
+    if finding or fields or not term:
         return find(term, fields)
     redirect(config.ROOT_URL + '/package/' + urllib.parse.quote(term))
 
