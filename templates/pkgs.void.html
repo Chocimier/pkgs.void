@@ -29,7 +29,7 @@
 				 <?py #endfor ?>
 				 <?py #endif ?>
 				 <?py if upstreamver: ?>
-                 <p>We know that authors released version<py:for each="version in upstreamver"> ${version}</py:for>. Please give maintainer some time to update.</p>
+                 <p>We know that authors released version ${', '.join(version for version in upstreamver)}. Please give maintainer some time to update.</p>
 				 <?py #endif ?>
 				 <?py if fields: ?>
                  
