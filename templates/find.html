@@ -3,7 +3,7 @@
         <main>
             <h1>Find packages</h1>
             <form action="${{root_url}}/search" method="GET">
-                <input type=text name=term value="${term}" class="form-control"/><br/>
+                <input type="text" name="term" value="${term}" class="form-control"/><br/>
                 <?py for f in fields: ?>
                 <?py escaped_field = _escape(f) ?>
                 <label><input type="checkbox" name="by"{== ' checked="checked"' if f in checked else '' ==} value="{== escaped_field ==}"/> by {== escaped_field ==}</label><br/>

@@ -2,7 +2,7 @@
 <?py featured = getattr(i, 'featured', False) ?>
 <li>
 <?py if featured: ?>
-<strong py:strip="not featured"><?py
+<strong><?py
 #endif ?>
                     <a href="${{root_url}}/package/${urlquote(str(i))}">${i}</a>
                     <?py if featured: ?>
