@@ -21,9 +21,13 @@ import humanize
 
 import datasource
 import present
-from custom_types import Binpkgs, Field, FoundPackages, Interest, Repo, ValueAt
+from custom_types import (
+    Binpkgs, Field, FoundPackages,
+    Interest, Repo, Response, ValueAt
+)
 from sink import same, now
 from xbps import split_arch, verrev_from_pkgver, version_from_verrev
+from workers.buildlog.buildlog import PROCESSING, get_log
 
 
 class RelevantProperty:
@@ -350,6 +354,22 @@ def of_day():
 
 def which_package():
     return present.render_template('which.html')
+
+
+def build_log(pkgname, arch, version):
+    pkgver = f'{pkgname}-{version}'
+    log = get_log(pkgver, arch)
+    if log == PROCESSING:
+        parameters = {
+            'pkgver': pkgver,
+            'arch': arch,
+            'pkgname': pkgname,
+            'version': version,
+        }
+        parameters['iset'], parameters['libc'] = split_arch(arch)
+        content = present.render_template('buildlog.html', **parameters)
+        return Response(content=content, redirect=None)
+    return Response(redirect=log, content=None)
 
 
 class Collection:

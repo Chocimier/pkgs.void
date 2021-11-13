@@ -61,7 +61,7 @@
           <section>
             <h3>Packages built together:</h3>
             <ul class="continuous">
-              
+
 			  <?py for subpkg in subpkgs: ?>
               <li><a href="${{root_url}}/package/${urlquote(subpkg)}">${subpkg}</a></li>
 			  <?py #endfor ?>
@@ -70,6 +70,15 @@
 		  <?py else: ?>
           
 		  <?py #endif ?>
+          <section>
+            <h3>Build logs</h3>
+            <ul class="continuous">
+            <?py for version in sorted(versions.all, key=lambda x: (x.data['iset'], x.data['libc'])): ?>
+              <?py arch = _escape('{iset}-{libc}'.format(**version.data)) ?>
+              <li><a href="${{root_url}}/buildlog/${urlquote(pkgname)}/${urlquote(arch)}/${urlquote(version.verrev)}">build log for ${arch} ${pkgname}</a></li>
+            <?py #endfor ?>
+            </ul>
+          </section>
           <?py echo('            ') ?>
           <?py for template in sorted(mainpkg['pkgname'].value): ?>
 <a href="https://github.com/void-linux/void-packages/blob/master/srcpkgs/${urlquote(template)}/template">Package template{== _escape(f' ({template})') if len(mainpkg['pkgname'].value) > 1 else '' ==}</a><?py

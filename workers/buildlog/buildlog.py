@@ -33,6 +33,7 @@ PACKAGE_MARK_PREFIX = '=> '
 PACKAGE_MARK_SUFFIX = ': running do-pkg hook: 00-gen-pkg ...'
 BUILDER_NAME_SUFFIX = '_builder'
 COMMIT_UPDATE = ': update to '
+PROCESSING = object()
 
 
 config = load_config('buildlog')
@@ -122,7 +123,7 @@ def scrap_log(arch, number):
 
 def _scrap_log(arch, number, datasource):
     url = config.PACKAGE_URL.format(arch=arch, number=number)
-    print('scraping', url)
+    logger.info('scrapping %s', url)
     with urlopen(url) as response:
         datasource.delete(batchnumber=number)
         for line in response.readlines():
@@ -156,13 +157,22 @@ def _package_order_key(package, pkgver):
     return -int(package.batchnumber)
 
 
+def get_log(pkgver, arch):
+    datasource = factory()
+    known = known_log(pkgver, arch, datasource)
+    if known:
+        return known
+    find_log.delay(pkgver, arch)
+    return PROCESSING
+
+
 @app.task()
 def find_log(pkgver, arch):
     datasource = factory()
     if known_log(pkgver, arch, datasource):
         return
     pkgname = xbps.pkgname_from_pkgver(pkgver)
-    packages = list(datasource.read(pkgname=pkgname, state=GUESS))
+    packages = list(datasource.read(pkgname=pkgname, arch=arch, state=GUESS))
     packages.sort(key=lambda bld: _package_order_key(bld, pkgver))
     for package in packages:
         scrap_log.delay(arch, package.batchnumber)
