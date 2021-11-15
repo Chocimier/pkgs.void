@@ -239,4 +239,4 @@ def factory(temporary=False):
 
 def update(func):
     with factory(temporary=True) as source:
-        func(source)
+        return func(source)
