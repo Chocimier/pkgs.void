@@ -37,7 +37,7 @@ PROCESSING = object()
 
 
 config = load_config('buildlog')
-app = Celery(__name__, broker=config.BROKER)
+app = Celery(__name__, broker=config.BROKER, backend=config.BROKER)
 logger = get_task_logger(__name__)
 
 
