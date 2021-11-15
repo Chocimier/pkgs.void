@@ -17,7 +17,7 @@ import json
 import math
 from urllib.request import urlopen
 
-from celery import Celery
+from celery import Celery, chain
 from celery.utils.log import get_task_logger
 
 import xbps
@@ -116,14 +116,23 @@ def parse_batch(data, arch, number, datasource):
     return Batch(arch, number, CONFIRMED)
 
 
+def scrap_log(arch, number, desired_pkgver=None):
+    return update(
+        lambda datasource: _scrap_log(arch, number, datasource, desired_pkgver)
+    )
+
+
 @app.task()
-def scrap_log(arch, number):
-    update(lambda datasource: _scrap_log(arch, number, datasource))
+def scrap_log_chain_link(already_found, arch, number, desired_pkgver):
+    if already_found:
+        return True
+    return scrap_log(arch, number, desired_pkgver)
 
 
-def _scrap_log(arch, number, datasource):
+def _scrap_log(arch, number, datasource, desired_pkgver=None):
     url = config.PACKAGE_URL.format(arch=arch, number=number)
     logger.info('scrapping %s', url)
+    already_found = False
     with urlopen(url) as response:
         datasource.delete(batchnumber=number)
         for line in response.readlines():
@@ -138,6 +147,9 @@ def _scrap_log(arch, number, datasource):
                     batchnumber=number,
                     state=CONFIRMED)
                 datasource.create(package)
+                if pkgver == desired_pkgver:
+                    already_found = True
+    return already_found
 
 
 def _is_log_mark_line(line):
@@ -174,8 +186,11 @@ def find_log(pkgver, arch):
     pkgname = xbps.pkgname_from_pkgver(pkgver)
     packages = list(datasource.read(pkgname=pkgname, arch=arch, state=GUESS))
     packages.sort(key=lambda bld: _package_order_key(bld, pkgver))
-    for package in packages:
-        scrap_log.delay(arch, package.batchnumber)
+
+    def sig(package):
+        return scrap_log_chain_link.s(arch, package.batchnumber, pkgver)
+
+    chain(sig(package) for package in packages).delay(False)
 
 
 @app.task()
