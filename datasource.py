@@ -569,6 +569,7 @@ class SqliteDataSource(Datasource):
             same_template
             )
             ''')
+        self._cursor.execute('''analyze''')
 
 
 def custom_factory(classname, *args, **kwargs):
