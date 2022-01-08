@@ -263,6 +263,9 @@ def data_generator(pkgname, single):
     if not binpkgs:
         return FoundPackages(None, other_archs, None)
     fields = combine_fields(fields_dic, binpkgs)
+    popularity_reports = next(source.auxiliary('popularity_reports'), None)
+    if popularity_reports is None:
+        fields = [i for i in fields if i.name != 'popularity']
     separated = separate_fields(fields, SEPARATED_FIELDS)
     upstreamver = new_versions(binpkgs, separated['upstreamver'].value)
     subpkgs = source.same_template(pkgname)
@@ -274,7 +277,7 @@ def data_generator(pkgname, single):
         'mainpkg': {'pkgname': separated['mainpkgname']},
         'subpkgs': list(subpkgs),
         'upstreamver': upstreamver,
-    }, other_archs, next(source.auxiliary('popularity_reports')))
+    }, other_archs, popularity_reports)
 
 
 def page_generator(pkgname, single=None):
