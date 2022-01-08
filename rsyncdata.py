@@ -51,6 +51,7 @@ def _is_of_arch(binpkg, repo):
 
 
 def _process_repo(source, repo, rsync_listing):
+    """Sets build date for packages not defining it in index."""
     for line in rsync_listing:
         line = line.strip()
         record = _stats(line)
@@ -62,6 +63,7 @@ def _process_repo(source, repo, rsync_listing):
             source.update(
                 pkgver=_pkgver_from_filename(record.name),
                 repo=repo,
+                builddate='',
                 set_builddate=date.strftime('%Y-%m-%d %H:%M')
             )
 

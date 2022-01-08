@@ -16,11 +16,34 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import sys
-from datetime import timedelta
+from datetime import datetime, timedelta
 from sink import now
 
 import datasource
 from repopaths import index_path, load_repo
+
+_OFFSETS = {
+    'CET': timedelta(hours=1),
+    'CEST': timedelta(hours=2),
+    'UTC': timedelta(hours=0),
+    'GMT': timedelta(hours=0),
+    'CDT': timedelta(hours=-5),
+    'CST': timedelta(hours=-6),
+}
+
+
+def parse_date(string):
+    time_str, zone_code = string.rsplit(' ', 1)
+    try:
+        time = datetime.strptime(time_str, '%Y-%m-%d %H:%M')
+    except ValueError:
+        return string
+    if zone_code not in _OFFSETS:
+        print("unknown timezone: {}".format(zone_code), file=sys.stderr)
+        _OFFSETS[zone_code] = timedelta(hours=0)
+    utc_time = time - _OFFSETS[zone_code]
+    result = utc_time.strftime('%Y-%m-%d %H:%M')
+    return result
 
 
 def build_db(source, repos):
@@ -37,13 +60,17 @@ def build_db(source, repos):
             for k, v in repodata[pkgname].items():
                 if isinstance(v, bytes):
                     v = v.decode()
-                dictionary[k] = v
+                if k == 'build-date':
+                    dictionary[k] = parse_date(v)
+                else:
+                    dictionary[k] = v
             depends_count = len(dictionary.get('run_depends', []))
             mainpkg = dictionary.get('source-revisions', pkgname).split(':')[0]
             source.create(datasource.PackageRow(
                 arch=arch,
                 pkgname=pkgname,
                 pkgver=dictionary['pkgver'],
+                builddate=dictionary.get('build-date', ''),
                 repodata=dictionary,
                 mainpkg=mainpkg,
                 depends_count=depends_count,
