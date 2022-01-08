@@ -1,4 +1,4 @@
-flake8>=3.7.9
-gprof2dot>=2019.11.30
-lxml>=4.6.3
-pylint>=2.4.4
+flake8>=4.0.1
+gprof2dot>=2021.2.21
+lxml>=4.7.1
+pylint>=2.12.2
