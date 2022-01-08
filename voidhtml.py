@@ -476,6 +476,15 @@ def no_page():
     return present.render_template('nopage.html')
 
 
+def opensearch_description(urlparts):
+    server = urlparts._replace(path='', query='').geturl()
+    return present.render_template(
+        'opensearch.xml',
+        present.SNIPPET,
+        server=server
+    )
+
+
 def main():
     print(page_generator(sys.argv[1], sys.argv[2]))
 

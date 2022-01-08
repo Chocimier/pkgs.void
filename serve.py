@@ -19,13 +19,14 @@ import sys
 import urllib.parse
 
 from bottle import HTTPResponse, ServerAdapter, default_app, error, redirect
-from bottle import request, route, run, server_names, static_file
+from bottle import request, response, route, run, server_names, static_file
 
 from settings import config
 from voidhtml import (
     build_log as build_log_page,
     find, lists_index, longest_names, main_page, metapackages,
-    newest, no_page, of_day, page_generator, popular, which_package
+    newest, no_page, of_day, opensearch_description,
+    page_generator, popular, which_package
 )
 from xbps import join_arch
 
@@ -72,11 +73,17 @@ def package_arch(pkgname, iset, libc):
 
 @route('/buildlog/<pkgname>/<iset>-<libc>/<version>')
 def build_log(pkgname, iset, libc, version):
-    response = build_log_page(pkgname, join_arch(iset, libc), version)
-    if response.redirect:
-        redirect(response.redirect)
+    result = build_log_page(pkgname, join_arch(iset, libc), version)
+    if result.redirect:
+        redirect(result.redirect)
     else:
-        raise HTTPResponse(response.content, 202)
+        raise HTTPResponse(result.content, 202)
+
+
+@route('/opensearch.xml')
+def opensearch():
+    response.content_type = 'application/opensearchdescription+xml'
+    return opensearch_description(request.urlparts)
 
 
 @route('/static/<filename:path>')

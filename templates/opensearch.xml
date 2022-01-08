@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/" xmlns:moz="http://www.mozilla.org/2006/browser/search/">
+  <ShortName>Void packages</ShortName>
+  <Description>Search Void Linux packages</Description>
+  <InputEncoding>UTF-8</InputEncoding>
+  <Image width="143" height="143" type="image/x-icon">${{server}}${{assets_url}}/img/favicon.png</Image>
+  <Url type="text/html" method="get" template="${{server}}${{root_url}}/search?term={searchTerms}"/>
+</OpenSearchDescription>
