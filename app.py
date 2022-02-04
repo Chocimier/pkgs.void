@@ -17,7 +17,7 @@
 
 import urllib.parse
 
-from flask import Flask
+from flask import Flask, redirect, request
 
 from settings import config
 from voidhtml import (
@@ -32,14 +32,15 @@ from xbps import join_arch
 app = Flask(__name__)
 
 
-# @route('/search/')
-def search():  # pylint: disable=inconsistent-return-statements
-    term = request.query.get('term')  # pylint: disable=no-member
-    finding = request.query.get('find')  # pylint: disable=no-member
-    fields = request.query.getall('by')  # pylint: disable=no-member
+@app.route('/search/')
+def search():
+    term = request.args.get('term')
+    finding = request.args.get('find')
+    fields = request.args.getlist('by')
     if finding or fields or not term:
         return find(term, fields)
-    redirect(config.ROOT_URL + '/package/' + urllib.parse.quote(term))
+    term = urllib.parse.quote(term)
+    return redirect(config.ROOT_URL + '/package/' + term + '/')
 
 
 # @route('/all/')
