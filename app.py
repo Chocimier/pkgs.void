@@ -32,7 +32,7 @@ from xbps import join_arch
 app = Flask(__name__)
 
 
-# @route('/search')
+# @route('/search/')
 def search():  # pylint: disable=inconsistent-return-statements
     term = request.query.get('term')  # pylint: disable=no-member
     finding = request.query.get('find')  # pylint: disable=no-member
@@ -42,7 +42,7 @@ def search():  # pylint: disable=inconsistent-return-statements
     redirect(config.ROOT_URL + '/package/' + urllib.parse.quote(term))
 
 
-# @route('/all')
+# @route('/all/')
 def list_all_():
     return static_file('all.html', config.GENERATED_FILES_PATH)
 
@@ -53,26 +53,26 @@ def source_tarball():
 
 
 app.route('/')(main_page)
-app.route('/toc')(lists_index)
-app.route('/of_day')(of_day)
-app.route('/newest')(newest)
-app.route('/sets')(metapackages)
-app.route('/popular')(popular)
-app.route('/longest_names')(longest_names)
-app.route('/package')(which_package)
+app.route('/toc/')(lists_index)
+app.route('/of_day/')(of_day)
+app.route('/newest/')(newest)
+app.route('/sets/')(metapackages)
+app.route('/popular/')(popular)
+app.route('/longest_names/')(longest_names)
+app.route('/package/')(which_package)
 
 
-@app.route('/package/<pkgname>')
+@app.route('/package/<pkgname>/')
 def package(pkgname):
     return page_generator(pkgname)
 
 
-@app.route('/package/<pkgname>/<iset>-<libc>')
+@app.route('/package/<pkgname>/<iset>-<libc>/')
 def package_arch(pkgname, iset, libc):
     return page_generator(pkgname, single=join_arch(iset, libc))
 
 
-# @route('/buildlog/<pkgname>/<iset>-<libc>/<version>')
+# @route('/buildlog/<pkgname>/<iset>-<libc>/<version>/')
 def build_log(pkgname, iset, libc, version):
     result = build_log_page(pkgname, join_arch(iset, libc), version)
     if result.redirect:
@@ -111,24 +111,6 @@ class UrlPrefixMiddleware():
 
 
 app.wsgi_app = UrlPrefixMiddleware(config.ROOT_URL, app.wsgi_app)
-
-# #https://www.bottlepy.org/docs/dev/recipes.html#ignore-trailing-slashes
-# class StripSlashMiddleware():
-#     def __init__(self, app):
-#         self._app = app
-
-#     def __call__(self, env, handler):
-#         env['PATH_INFO'] = env['PATH_INFO'].rstrip('/')
-#         return self._app(env, handler)
-
-
-# application = StripSlashMiddleware(  # pylint: disable=invalid-name
-#     UrlPrefixMiddleware(
-#         config.ROOT_URL,
-#         default_app()
-#     )
-# )
-
 
 # class FlupSocketFCGIServer(ServerAdapter):
 #     def run(self, handler):
