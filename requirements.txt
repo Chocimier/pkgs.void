@@ -1,5 +1,5 @@
-bottle>=0.12.19
 celery[redis]>=5.2.3
+Flask>=2.0.2
 flup>=1.0.3
 humanize>=3.13.1
 Tenjin>=1.1.1

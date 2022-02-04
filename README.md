@@ -18,7 +18,7 @@ Web catalog of Void Linux packages.
  instance of catalog, accordingly to AGPL license.
  This modifies void-packages clone. Either make sure that xdistdir will find
  clone of void-packages, or disable repo parsing with `-T` flag.
-6. Run: `./serve.py`
+6. Run: `flask run`
 
 There is a CGI script `cgi.sh` and FCGI script: `fcgi.sh`.
 

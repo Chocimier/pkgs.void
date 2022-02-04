@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019-2021 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2022 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,11 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import sys
 import urllib.parse
 
-from bottle import HTTPResponse, ServerAdapter, default_app, error, redirect
-from bottle import request, response, route, run, server_names, static_file
+from flask import Flask
 
 from settings import config
 from voidhtml import (
@@ -31,7 +29,10 @@ from voidhtml import (
 from xbps import join_arch
 
 
-@route('/search')
+app = Flask(__name__)
+
+
+# @route('/search')
 def search():  # pylint: disable=inconsistent-return-statements
     term = request.query.get('term')  # pylint: disable=no-member
     finding = request.query.get('find')  # pylint: disable=no-member
@@ -41,37 +42,37 @@ def search():  # pylint: disable=inconsistent-return-statements
     redirect(config.ROOT_URL + '/package/' + urllib.parse.quote(term))
 
 
-@route('/all')
+# @route('/all')
 def list_all_():
     return static_file('all.html', config.GENERATED_FILES_PATH)
 
 
-@route(config.GENERATED_FILES_URL + '/pkgs.void.tar.bz2')
+# @route(config.GENERATED_FILES_URL + '/pkgs.void.tar.bz2')
 def source_tarball():
     return static_file('pkgs.void.tar.bz2', config.GENERATED_FILES_PATH)
 
 
-route('/')(route('')(main_page))
-route('/toc')(lists_index)
-route('/of_day')(of_day)
-route('/newest')(newest)
-route('/sets')(metapackages)
-route('/popular')(popular)
-route('/longest_names')(longest_names)
-route('/package')(which_package)
+app.route('/')(main_page)
+app.route('/toc')(lists_index)
+app.route('/of_day')(of_day)
+app.route('/newest')(newest)
+app.route('/sets')(metapackages)
+app.route('/popular')(popular)
+app.route('/longest_names')(longest_names)
+app.route('/package')(which_package)
 
 
-@route('/package/<pkgname>')
+@app.route('/package/<pkgname>')
 def package(pkgname):
     return page_generator(pkgname)
 
 
-@route('/package/<pkgname>/<iset>-<libc>')
+@app.route('/package/<pkgname>/<iset>-<libc>')
 def package_arch(pkgname, iset, libc):
     return page_generator(pkgname, single=join_arch(iset, libc))
 
 
-@route('/buildlog/<pkgname>/<iset>-<libc>/<version>')
+# @route('/buildlog/<pkgname>/<iset>-<libc>/<version>')
 def build_log(pkgname, iset, libc, version):
     result = build_log_page(pkgname, join_arch(iset, libc), version)
     if result.redirect:
@@ -80,72 +81,68 @@ def build_log(pkgname, iset, libc, version):
         raise HTTPResponse(result.content, 202)
 
 
-@route('/opensearch.xml')
+# @route('/opensearch.xml')
 def opensearch():
     response.content_type = 'application/opensearchdescription+xml'
     return opensearch_description(request.urlparts)
 
 
-@route('/static/<filename:path>')
+# @route('/static/<filename:path>')
 def static(filename):
     return static_file(filename, 'static')
 
 
-@error(404)
+# @error(404)
 def error404(err):
     del err
     return no_page()
 
 
-class UrlPrefixMiddleware():
-    def __init__(self, prefix, app):
-        self._app = app
-        self._prefix = prefix
-        self._prefix_len = len(prefix)
+# class UrlPrefixMiddleware():
+#     def __init__(self, prefix, app):
+#         self._app = app
+#         self._prefix = prefix
+#         self._prefix_len = len(prefix)
 
-    def __call__(self, env, handler):
-        if env['PATH_INFO'].startswith(self._prefix):
-            env['PATH_INFO'] = env['PATH_INFO'][self._prefix_len:]
-        return self._app(env, handler)
-
-
-# https://www.bottlepy.org/docs/dev/recipes.html#ignore-trailing-slashes
-class StripSlashMiddleware():
-    def __init__(self, app):
-        self._app = app
-
-    def __call__(self, env, handler):
-        env['PATH_INFO'] = env['PATH_INFO'].rstrip('/')
-        return self._app(env, handler)
+#     def __call__(self, env, handler):
+#         if env['PATH_INFO'].startswith(self._prefix):
+#             env['PATH_INFO'] = env['PATH_INFO'][self._prefix_len:]
+#         return self._app(env, handler)
 
 
-application = StripSlashMiddleware(  # pylint: disable=invalid-name
-    UrlPrefixMiddleware(
-        config.ROOT_URL,
-        default_app()
-    )
-)
+# #https://www.bottlepy.org/docs/dev/recipes.html#ignore-trailing-slashes
+# class StripSlashMiddleware():
+#     def __init__(self, app):
+#         self._app = app
+
+#     def __call__(self, env, handler):
+#         env['PATH_INFO'] = env['PATH_INFO'].rstrip('/')
+#         return self._app(env, handler)
 
 
-class FlupSocketFCGIServer(ServerAdapter):
-    def run(self, handler):
-        # pylint: disable=import-outside-toplevel
-        import flup.server.fcgi
-        flup.server.fcgi.WSGIServer(handler).run()
+# application = StripSlashMiddleware(  # pylint: disable=invalid-name
+#     UrlPrefixMiddleware(
+#         config.ROOT_URL,
+#         default_app()
+#     )
+# )
 
 
-def serve(args):
-    server_names['flup_socket'] = FlupSocketFCGIServer
-
-    kwargs = {}
-
-    try:
-        kwargs['server'] = args[0]
-    except IndexError:
-        pass
-
-    run(app=application, debug=True, reloader=config.DEVEL_MODE, **kwargs)
+# class FlupSocketFCGIServer(ServerAdapter):
+#     def run(self, handler):
+#         # pylint: disable=import-outside-toplevel
+#         import flup.server.fcgi
+#         flup.server.fcgi.WSGIServer(handler).run()
 
 
-if __name__ == '__main__':
-    serve(sys.argv[1:])
+# def serve(args):
+#     server_names['flup_socket'] = FlupSocketFCGIServer
+
+#     kwargs = {}
+
+#     try:
+#         kwargs['server'] = args[0]
+#     except IndexError:
+#         pass
+
+#     run(app=application, debug=True, reloader=config.DEVEL_MODE, **kwargs)
