@@ -98,17 +98,19 @@ def error404(err):
     return no_page()
 
 
-# class UrlPrefixMiddleware():
-#     def __init__(self, prefix, app):
-#         self._app = app
-#         self._prefix = prefix
-#         self._prefix_len = len(prefix)
+class UrlPrefixMiddleware():
+    def __init__(self, prefix, application):
+        self._app = application
+        self._prefix = prefix
+        self._prefix_len = len(prefix)
 
-#     def __call__(self, env, handler):
-#         if env['PATH_INFO'].startswith(self._prefix):
-#             env['PATH_INFO'] = env['PATH_INFO'][self._prefix_len:]
-#         return self._app(env, handler)
+    def __call__(self, env, handler):
+        if env['PATH_INFO'].startswith(self._prefix):
+            env['PATH_INFO'] = env['PATH_INFO'][self._prefix_len:]
+        return self._app(env, handler)
 
+
+app.wsgi_app = UrlPrefixMiddleware(config.ROOT_URL, app.wsgi_app)
 
 # #https://www.bottlepy.org/docs/dev/recipes.html#ignore-trailing-slashes
 # class StripSlashMiddleware():
