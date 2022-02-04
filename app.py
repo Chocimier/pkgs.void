@@ -15,9 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-import urllib.parse
+from urllib.parse import quote, urlsplit
 
-from flask import Flask, redirect, request
+from flask import Flask, Response, redirect, request
 
 from settings import config
 from voidhtml import (
@@ -39,7 +39,7 @@ def search():
     fields = request.args.getlist('by')
     if finding or fields or not term:
         return find(term, fields)
-    term = urllib.parse.quote(term)
+    term = quote(term)
     return redirect(config.ROOT_URL + '/package/' + term + '/')
 
 
@@ -82,10 +82,15 @@ def build_log(pkgname, iset, libc, version):
         raise HTTPResponse(result.content, 202)
 
 
-# @route('/opensearch.xml')
+@app.route('/opensearch.xml')
 def opensearch():
-    response.content_type = 'application/opensearchdescription+xml'
-    return opensearch_description(request.urlparts)
+    urlparts = urlsplit(request.url)
+    print(request.url, urlparts)
+    response = Response(
+        response=opensearch_description(urlparts),
+        content_type='application/opensearchdescription+xml'
+    )
+    return response
 
 
 # @route('/static/<filename:path>')
