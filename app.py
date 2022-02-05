@@ -79,7 +79,8 @@ def build_log(pkgname, iset, libc, version):
     result = build_log_page(pkgname, join_arch(iset, libc), version)
     if result.redirect:
         return redirect(result.redirect)
-    return (result.content, 202)
+    status = 202 if not result.error else 501
+    return (result.content, status)
 
 
 @app.route('/opensearch.xml')

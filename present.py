@@ -103,6 +103,10 @@ def render_template(template_path, template_mode=None, **kwargs):
     return _loader().render(template_path, context, layout='base.html')
 
 
+def render_paragraph(text):
+    return render_template('paragraph.html', text=text)
+
+
 def as_new_version(versions):
     return render_template(
         'small/as_new_version.html',

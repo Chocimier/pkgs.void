@@ -27,7 +27,7 @@ from custom_types import (
 )
 from sink import same, now
 from xbps import split_arch, verrev_from_pkgver, version_from_verrev
-from workers.buildlog.buildlog import PROCESSING, get_log
+from workers.buildlog.buildlog import TASK_ERROR, TASK_PROCESSING, get_log
 
 
 class RelevantProperty:
@@ -362,7 +362,7 @@ def which_package():
 def build_log(pkgname, arch, version):
     pkgver = f'{pkgname}-{version}'
     log = get_log(pkgver, arch)
-    if log == PROCESSING:
+    if log == TASK_PROCESSING:
         parameters = {
             'pkgver': pkgver,
             'arch': arch,
@@ -371,8 +371,12 @@ def build_log(pkgname, arch, version):
         }
         parameters['iset'], parameters['libc'] = split_arch(arch)
         content = present.render_template('buildlog.html', **parameters)
-        return Response(content=content, redirect=None)
-    return Response(redirect=log, content=None)
+        return Response(content=content, redirect=None, error=None)
+    if log == TASK_ERROR:
+        text = 'Searching for build log failed, unfortunately.'
+        content = present.render_paragraph(text=text)
+        return Response(error=True, content=content, redirect=None)
+    return Response(redirect=log, content=None, error=None)
 
 
 class Collection:

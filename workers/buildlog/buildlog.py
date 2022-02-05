@@ -33,7 +33,8 @@ PACKAGE_MARK_PREFIX = '=> '
 PACKAGE_MARK_SUFFIX = ': running do-pkg hook: 00-gen-pkg ...'
 BUILDER_NAME_SUFFIX = '_builder'
 COMMIT_UPDATE = ': update to '
-PROCESSING = object()
+TASK_PROCESSING = object()
+TASK_ERROR = object()
 
 
 config = load_config('buildlog')
@@ -174,8 +175,11 @@ def get_log(pkgver, arch):
     known = known_log(pkgver, arch, datasource)
     if known:
         return known
-    find_log.delay(pkgver, arch)
-    return PROCESSING
+    try:
+        find_log.delay(pkgver, arch)
+    except Exception:  # pylint: disable=broad-except
+        return TASK_ERROR
+    return TASK_PROCESSING
 
 
 @app.task()

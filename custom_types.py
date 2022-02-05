@@ -102,7 +102,11 @@ class Interest(Enum):
 Repo = namedtuple('Repo', ('repo', 'reason'))
 
 
-Response = namedtuple('Response', ('content', 'redirect'))
+Response = namedtuple('Response', (
+    'content',
+    'redirect',
+    'error'
+))
 
 
 ValueAt = namedtuple('ValueAt', ('value', 'coords'))
