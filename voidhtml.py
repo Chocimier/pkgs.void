@@ -480,7 +480,7 @@ def lists_index():
 
 
 def no_page():
-    return present.render_template('nopage.html')
+    return present.render_paragraph('There is no such page.')
 
 
 def opensearch_description(urlparts):
