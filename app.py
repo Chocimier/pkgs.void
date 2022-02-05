@@ -112,22 +112,3 @@ class UrlPrefixMiddleware():
 
 
 app.wsgi_app = UrlPrefixMiddleware(config.ROOT_URL, app.wsgi_app)
-
-# class FlupSocketFCGIServer(ServerAdapter):
-#     def run(self, handler):
-#         # pylint: disable=import-outside-toplevel
-#         import flup.server.fcgi
-#         flup.server.fcgi.WSGIServer(handler).run()
-
-
-# def serve(args):
-#     server_names['flup_socket'] = FlupSocketFCGIServer
-
-#     kwargs = {}
-
-#     try:
-#         kwargs['server'] = args[0]
-#     except IndexError:
-#         pass
-
-#     run(app=application, debug=True, reloader=config.DEVEL_MODE, **kwargs)
