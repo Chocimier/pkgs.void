@@ -98,10 +98,10 @@ def static(filename):
     return static_file(filename, 'static')
 
 
-# @error(404)
+@app.errorhandler(404)
 def error404(err):
     del err
-    return no_page()
+    return (no_page(), 404)
 
 
 class UrlPrefixMiddleware():
