@@ -73,13 +73,12 @@ def package_arch(pkgname, iset, libc):
     return page_generator(pkgname, single=join_arch(iset, libc))
 
 
-# @route('/buildlog/<pkgname>/<iset>-<libc>/<version>/')
+@app.route('/buildlog/<pkgname>/<iset>-<libc>/<version>/')
 def build_log(pkgname, iset, libc, version):
     result = build_log_page(pkgname, join_arch(iset, libc), version)
     if result.redirect:
-        redirect(result.redirect)
-    else:
-        raise HTTPResponse(result.content, 202)
+        return redirect(result.redirect)
+    return (result.content, 202)
 
 
 @app.route('/opensearch.xml')
