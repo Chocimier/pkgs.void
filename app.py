@@ -17,7 +17,7 @@
 
 from urllib.parse import quote, urlsplit
 
-from flask import Flask, Response, redirect, request
+from flask import Flask, Response, redirect, request, send_from_directory
 
 from settings import config
 from voidhtml import (
@@ -43,14 +43,15 @@ def search():
     return redirect(config.ROOT_URL + '/package/' + term + '/')
 
 
-# @route('/all/')
+@app.route('/all/')
 def list_all_():
-    return static_file('all.html', config.GENERATED_FILES_PATH)
+    return send_from_directory(config.GENERATED_FILES_PATH, 'all.html')
 
 
-# @route(config.GENERATED_FILES_URL + '/pkgs.void.tar.bz2')
+@app.route(config.GENERATED_FILES_URL + '/pkgs.void.tar.bz2')
 def source_tarball():
-    return static_file('pkgs.void.tar.bz2', config.GENERATED_FILES_PATH)
+    directory = config.GENERATED_FILES_PATH
+    return send_from_directory(directory, 'pkgs.void.tar.bz2')
 
 
 app.route('/')(main_page)
@@ -90,11 +91,6 @@ def opensearch():
         content_type='application/opensearchdescription+xml'
     )
     return response
-
-
-# @route('/static/<filename:path>')
-def static(filename):
-    return static_file(filename, 'static')
 
 
 @app.errorhandler(404)
