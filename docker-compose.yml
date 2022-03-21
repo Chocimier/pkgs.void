@@ -11,6 +11,14 @@ services:
       dockerfile: misc/docker/webapp.dockerfile
     image: pkgs-webapp
     volumes: [ ./misc/docker/volumes/pkgs-db:/var/db ]
+  buildlog:
+    build:
+      dockerfile: misc/docker/buildlog.dockerfile
+    image: pkgs-buildlog
+    volumes:
+      - ./misc/docker/volumes/pkgs-db:/var/db
+  queue:
+    image: redis:alpine
   update:
     build:
       dockerfile: misc/docker/update.dockerfile
