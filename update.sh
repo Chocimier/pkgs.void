@@ -44,6 +44,8 @@ mirror="$(./settings.py REPODATA_MIRROR)"
 rsyncmirror="$(./settings.py RSYNC_MIRROR)"
 popcornmirror="$(./settings.py POPCORN_MIRROR)"
 generated="$(./settings.py GENERATED_FILES_PATH)"
+newindex="$(./settings.py DATASOURCE_ARGUMENTS_TEMPORARY | sed 's/,.*//')"
+index="$(./settings.py DATASOURCE_ARGUMENTS | sed 's/,.*//')"
 mkdir -p "$generated"
 cd .. || exit 1
 tar cjf "$dir/$generated/tmp.tar.bz2" --exclude-ignore tar-exclude "$dir" || exit 1
@@ -98,13 +100,13 @@ done
 
 cd .. || exit 1
 
-rm -f newindex.sqlite3
+rm -f "$newindex"
 ./builddb.py $repos
 [ "$templates" ] && ./dbfromrepo.py $repos
 [ "$updates" ] && ./updates.py $repos
 [ "$popularity" ] && ./popularity.py
 ./rsyncdata.py $repos
 
-mv newindex.sqlite3 index.sqlite3
+mv "$newindex" "$index"
 
 python -c 'import voidhtml; print(voidhtml.list_all())' > "$generated"/all.html
