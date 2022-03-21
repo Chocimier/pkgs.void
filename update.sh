@@ -25,7 +25,7 @@ popularity=yes
 path="$(realpath "$(dirname "$0")")"
 dir="$(basename "$path")"
 cd $path || exit 1
-. venv/bin/activate
+[ -d venv ] && . venv/bin/activate
 
 while true
 do

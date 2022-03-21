@@ -1,3 +1,3 @@
 #!/bin/sh
-. venv/bin/activate
+[ -d venv ] && . venv/bin/activate
 python serve.py cgi
