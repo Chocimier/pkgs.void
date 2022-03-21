@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  app1:
+    build:
+      dockerfile: misc/docker/webapp.dockerfile
+    image: pkgs-webapp
+    volumes: [ ./misc/docker/volumes/pkgs-db:/var/db ]
+  app2:
+    build:
+      dockerfile: misc/docker/webapp.dockerfile
+    image: pkgs-webapp
+    volumes: [ ./misc/docker/volumes/pkgs-db:/var/db ]
+  update:
+    build:
+      dockerfile: misc/docker/update.dockerfile
+    image: pkgs-update
+    volumes:
+      - ./misc/docker/volumes/pkgs-db:/var/db
+      - ./static:/var/www/pkgs.void/static
+  webserver:
+    image: sebp/lighttpd
+    ports: [ "7547:80" ]
+    volumes:
+      - ./misc/docker/volumes/webserver-cfg:/etc/lighttpd
+      - ./static:/var/www/pkgs.void/static

@@ -1,5 +1,6 @@
 data/
 metadata/metapackage_interest.local.json
+misc/docker/volumes/pkgs-db/
 static/generated/
 static/source/
 venv/
