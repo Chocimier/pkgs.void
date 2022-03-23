@@ -2,6 +2,7 @@
 Fast lxml-based XML plist reader/editor.
 """
 
+import base64
 import datetime
 import lxml.etree
 
@@ -105,8 +106,8 @@ def collapse(v):
         return _elem('integer', str(v))
     elif isinstance(v, bool):
         return _elem(str(v).lower(), None)
-    elif isinstance(v, str):
-        return _elem('data', v.encode('base64'))
+    elif isinstance(v, bytes):
+        return _elem('data', base64.b64encode(v))
     elif isinstance(v, (list, PListArray)):
         parent = _elem('array')
         for subv in v:
@@ -128,7 +129,7 @@ TYPES = {
     'integer':  lambda elem: int(elem.text),
     'true':     lambda elem: True,
     'false':    lambda elem: False,
-    'data':     lambda elem: elem.text.decode('base64'),
+    'data':     lambda elem: base64.b64decode(elem.text.encode()),
     'array':    PListArray,
     'dict':     PListDict
 }
