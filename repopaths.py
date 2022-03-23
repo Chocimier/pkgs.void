@@ -16,8 +16,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import plistlib
 import sys
+
+from thirdparty import plistop
 
 
 DATADIR = 'data'
@@ -57,7 +58,7 @@ def index_path(repo):
 def load_repo(path):
     try:
         with open(path, 'rb') as xml_file:
-            plist_index = plistlib.load(xml_file, fmt=plistlib.FMT_XML)
+            plist_index = plistop.parse(xml_file)
         return plist_index
     except FileNotFoundError:
         return None

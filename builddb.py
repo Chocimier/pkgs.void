@@ -21,6 +21,7 @@ from sink import now
 
 import datasource
 from repopaths import index_path, load_repo
+from thirdparty import plistop
 
 _OFFSETS = {
     'CET': timedelta(hours=1),
@@ -46,6 +47,16 @@ def parse_date(string):
     return result
 
 
+def to_std_types(plist):
+    if isinstance(plist, bytes):
+        return plist.decode()
+    if isinstance(plist, plistop.PListArray):
+        return [to_std_types(i) for i in plist]
+    if isinstance(plist, plistop.PListDict):
+        return {k: to_std_types(plist[k]) for k in plist}
+    return plist
+
+
 def build_db(source, repos):
     today = now().date()
     tomorrow = today + timedelta(days=1)
@@ -55,15 +66,13 @@ def build_db(source, repos):
         if repodata is None:
             continue
         arch = repo.rpartition('/')[-1]
-        for pkgname in repodata:
+        for pkgname, pkgdict in repodata.iteritems():
             dictionary = {}
-            for k, v in repodata[pkgname].items():
-                if isinstance(v, bytes):
-                    v = v.decode()
+            for k, v in pkgdict.iteritems():
                 if k == 'build-date':
                     dictionary[k] = parse_date(v)
                 else:
-                    dictionary[k] = v
+                    dictionary[k] = to_std_types(v)
             depends_count = len(dictionary.get('run_depends', []))
             mainpkg = dictionary.get('source-revisions', pkgname).split(':')[0]
             source.create(datasource.PackageRow(
