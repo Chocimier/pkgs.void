@@ -21,6 +21,7 @@ download=yes
 templates=yes
 updates=
 popularity=yes
+builddate=yes
 
 path="$(realpath "$(dirname "$0")")"
 dir="$(basename "$path")"
@@ -30,6 +31,7 @@ cd $path || exit 1
 while true
 do
     case "$1" in
+        -B) builddate= ;;
         -D) download= ;;
         -P) popularity= ;;
         -T) templates= ;;
@@ -86,12 +88,14 @@ for path in $repos; do
 	tar xf "$filename" -C "$extract_dir"
 done
 
-for path in $repos; do
-	echo "$(cd ..; ./repopaths.py rsync_path "$path")"
-done | sort -u | while read dir; do
-	filename="$(cd ..; ./repopaths.py rsync_filename "$dir")"
-	[ "$download" ] && rsync --list-only "${rsyncmirror}${dir}" --include '*.xbps' --exclude='*' > "${filename}"
-done
+if [ "$builddate" ]; then
+	for path in $repos; do
+		echo "$(cd ..; ./repopaths.py rsync_path "$path")"
+	done | sort -u | while read dir; do
+		filename="$(cd ..; ./repopaths.py rsync_filename "$dir")"
+		[ "$download" ] && rsync --list-only "${rsyncmirror}${dir}" --include '*.xbps' --exclude='*' > "${filename}"
+	done
+fi
 
 [ "$download" ] && [ "$updates" ] && wget -q -O void-updates.txt "$mirror/void-updates/void-updates.txt"
 [ "$download" ] && [ "$popularity" ] &&
@@ -105,7 +109,7 @@ rm -f "$newindex"
 [ "$templates" ] && ./dbfromrepo.py $repos
 [ "$updates" ] && ./updates.py $repos
 [ "$popularity" ] && ./popularity.py
-./rsyncdata.py $repos
+[ "$builddate" ] && ./rsyncdata.py $repos
 
 mv "$newindex" "$index"
 
