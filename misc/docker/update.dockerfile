@@ -14,4 +14,4 @@ COPY misc/docker/config-docker.ini config.ini
 COPY misc/docker/cronjob.sh /etc/periodic/hourly
 
 VOLUME /var/db
-CMD /etc/periodic/hourly/cronjob.sh -T && crond -f
+CMD /etc/periodic/hourly/cronjob.sh -T -B && crond -f
