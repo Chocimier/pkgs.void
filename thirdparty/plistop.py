@@ -3,7 +3,6 @@ Fast lxml-based XML plist reader/editor.
 """
 
 import datetime
-import iso8601
 import lxml.etree
 
 __all__ = ['parse', 'factory', 'dumps', 'dict', 'array']
@@ -104,8 +103,6 @@ def collapse(v):
         return _elem('real', str(v))
     elif isinstance(v, int):
         return _elem('integer', str(v))
-    elif isinstance(v, datetime.datetime):
-        return _elem('date', v.isoformat())
     elif isinstance(v, bool):
         return _elem(str(v).lower(), None)
     elif isinstance(v, str):
@@ -129,7 +126,6 @@ TYPES = {
     'string':   lambda elem: elem.text,
     'real':     lambda elem: float(elem.text),
     'integer':  lambda elem: int(elem.text),
-    'date':     lambda elem: iso8601.parse_date(elem.text),
     'true':     lambda elem: True,
     'false':    lambda elem: False,
     'data':     lambda elem: elem.text.decode('base64'),
