@@ -8,10 +8,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 RUN apk add bash
 RUN apk add git rsync tar wget xbps zstd
+RUN echo '20,50 * * * * sh /var/www/pkgs.void/misc/docker/cronjob.sh' >> /var/spool/cron/crontabs/root
 RUN git clone --depth 1 https://github.com/leahneukirchen/xtools /var/www/xtools
 COPY . .
 COPY misc/docker/config-docker.ini config.ini
-COPY misc/docker/cronjob.sh /etc/periodic/hourly
 
 VOLUME /var/db
-CMD /etc/periodic/hourly/cronjob.sh -T -B && crond -f
+CMD /var/www/pkgs.void/misc/docker/cronjob.sh -T -B && crond -f
