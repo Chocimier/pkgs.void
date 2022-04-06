@@ -5,6 +5,7 @@
 if [ "$1" != -T ]; then
 	if ! [ -d "$XBPS_DISTDIR" ]; then
 		git clone --depth 1 "$void_packages" "$XBPS_DISTDIR" || exit $?
+		cp /var/www/pkgs.void/misc/docker/xbps-src.conf "$XBPS_DISTDIR/etc/conf" || exit $?
 	fi
 fi
 env PATH=$PATH:/var/www/xtools XBPS_DISTDIR=$XBPS_DISTDIR /var/www/pkgs.void/update.sh "$@"
