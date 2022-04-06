@@ -7,6 +7,8 @@ Web catalog of Void Linux packages.
 
 # Running
 
+See also [Running with docker](#running-with-docker).
+
 1. Clone and enter repo: `git clone https://github.com/Chocimier/pkgs.void && cd pkgs.void`
 2. Create and activate Python 3 virtualenv:
  `python3 -m virtualenv -p python3 venv && . venv/bin/activate`
@@ -31,3 +33,20 @@ Settings in `config.ini`, if any, overrride setttings in `configs/defaults.ini`
 Optional worker collecting build logs info from official Void builder
 requires a queue server. By default it's redis, but can be configured
 to other supported by Celery.
+
+## Running with docker
+
+1. Run `docker-compose up`.
+
+This starts webserver listening on port 7547, two instances of webapp,
+cron for updating database, buildlog worker and a queue server.
+Containers communicate through shared voulems, so need to be run on
+same host.
+
+Configuration of webserver is loaded from volume mounted from
+`misc/docker/volumes/webserver-cfg`. It specifies count of webapp
+instances and logging level.
+
+Container that updates database builds minimal database on every
+startup within 3 minutes, then full database two times an hour. Webapp
+fails before first database is created.
