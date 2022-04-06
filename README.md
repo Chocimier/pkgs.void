@@ -13,8 +13,7 @@ See also [Running with docker](#running-with-docker).
 2. Create and activate Python 3 virtualenv:
  `python3 -m virtualenv -p python3 venv && . venv/bin/activate`
 3. Install dependencies: `pip install -r requirements.txt`
- From non-python tools, rsync, xtools and wget is needed.
- Graphviz is used by profiling script.
+ Used non-python tools are git, rsync, xbps, xtools and wget.
 4. Clone https://github.com/void-linux/void-packages .
 5. Generate database: `./update.sh`. This step publish whole directory on your
  instance of catalog, accordingly to AGPL license.
@@ -50,3 +49,9 @@ instances and logging level.
 Container that updates database builds minimal database on every
 startup within 3 minutes, then full database two times an hour. Webapp
 fails before first database is created.
+
+# Developing
+Lint hooks are installed by symlinking `.git/hooks` to `git_hooks`.
+They use tools specified in `requirements-dev.txt`.
+Pylint takes few seconds on commit to scan code.
+Profiling script use graphviz.
