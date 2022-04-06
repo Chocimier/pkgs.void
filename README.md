@@ -22,6 +22,12 @@ Web catalog of Void Linux packages.
 
 There is a CGI script `cgi.sh` and FCGI script: `fcgi.sh`.
 
-# Configuration:
+## Configuration:
 
 Settings in `config.ini`, if any, overrride setttings in `configs/defaults.ini`
+
+## Buildlog worker
+
+Optional worker collecting build logs info from official Void builder
+requires a queue server. By default it's redis, but can be configured
+to other supported by Celery.
