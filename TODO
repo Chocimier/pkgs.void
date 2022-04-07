@@ -3,7 +3,18 @@ look - page title, html formatting
 
 then:
 more speed
+- pre-render main page except of date
 incremental update
 
 maybe:
 restricted for archs
+make it proper module (would need a way to publish source)
+build db without binary repository
+- package for arch without binary repo, or broken one, displays in search results, but has no page
+packages build together only on main package
+build logs only on main package
+no link back from buildlog page
+tar-exclude assumes root dir name
+docker secret and upload over sharing volume
+rewrite shell scripts in python
+handel non-utf8 logs (https://build.voidlinux.org/builders/x86_64_builder/builds/31927/steps/shell_3/logs/stdio/text)
