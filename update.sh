@@ -48,6 +48,12 @@ popcornmirror="$(./settings.py POPCORN_MIRROR)"
 generated="$(./settings.py GENERATED_FILES_PATH)"
 newindex="$(./settings.py DATASOURCE_ARGUMENTS_TEMPORARY | sed 's/,.*//')"
 index="$(./settings.py DATASOURCE_ARGUMENTS | sed 's/,.*//')"
+
+if ! [ -e "$index" ]; then
+	./initemptydb.py
+	mv "$newindex" "$index"
+fi
+
 mkdir -p "$generated"
 cd .. || exit 1
 tar cjf "$dir/$generated/tmp.tar.bz2" --exclude-ignore tar-exclude "$dir" || exit 1
