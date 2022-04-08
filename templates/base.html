@@ -44,7 +44,7 @@
             </nav>
             <div class="searchbar">
             <form action="${{root_url}}/search" method="GET" class="form-inline">
-                <a href="${{root_url}}">Featured packages</a>
+                <a href="${{root_url or '/'}}">Featured packages</a>
                 <a href="${{root_url}}/all">All packages</a>
                 <input name="term" type="text" class="form-control"/>
                 <input type="submit" value="View" class="btn btn-green"/>
