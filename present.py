@@ -29,9 +29,6 @@ from custom_types import ValueAt
 from settings import config
 
 
-_CACHED_LOADER = None
-
-
 Area = namedtuple('Area', ('value', 'coords'))
 
 
@@ -46,6 +43,25 @@ class CustomPreprocessor(SafePreprocessor):
         )
 
 
+class LoaderCache:
+    def __init__(self):
+        self.engine = None
+
+    def loader(self):
+        if config.DEVEL_MODE or self.engine is None:
+            self.engine = SafeEngine(
+                path=['templates'],
+                preprocess=True,
+                preprocessorclass=CustomPreprocessor,
+                cache=MemoryCacheStorage()
+            )
+        return self.engine
+
+
+_loader_cache = LoaderCache()
+_loader = _loader_cache.loader
+
+
 def web_parameters():
     return {
         'root_url': config.ROOT_URL,
@@ -54,18 +70,6 @@ def web_parameters():
         'generated_files_url': config.GENERATED_FILES_URL,
         'urlquote': urlquote,
     }
-
-
-def _loader():
-    global _CACHED_LOADER  # pylint: disable=global-statement
-    if config.DEVEL_MODE or _CACHED_LOADER is None:
-        _CACHED_LOADER = SafeEngine(
-            path=['templates'],
-            preprocess=True,
-            preprocessorclass=CustomPreprocessor,
-            cache=MemoryCacheStorage()
-        )
-    return _CACHED_LOADER
 
 
 def parse_contact(value):
