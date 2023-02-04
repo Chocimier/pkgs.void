@@ -43,6 +43,7 @@ def load_config(section=DEFAULT_SECTION):
 
 def convert_types(values, section):
     if section == 'common':
+        # pylint: disable=superfluous-parens
         values.DEVEL_MODE = (values.DEVEL_MODE == 'yes')
         values.DAILY_HASH_BITS = int(values.DAILY_HASH_BITS)
     if section == 'buildlog':
@@ -63,6 +64,7 @@ def usage(script_name, bad_command=None, config_arg=None):
 
 
 def main(*args):
+    # pylint: disable=used-before-assignment
     if len(args) == 2:
         script_name, key = args
         config_for_print = config

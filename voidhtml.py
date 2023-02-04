@@ -383,6 +383,7 @@ class Collection:
     def __init__(self, dictionary):
         self._pkgname = dictionary['pkgname']
         interest = Interest(dictionary['classification'])
+        # pylint: disable=superfluous-parens
         self.featured = (interest == Interest.BORING)
 
     def __str__(self):

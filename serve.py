@@ -15,6 +15,8 @@
 # You should have received a copy of the GNU Affero General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+# pylint: disable=invalid-name,used-before-assignment
+
 from sys import argv, exit as sys_exit, stderr
 
 from app import app
