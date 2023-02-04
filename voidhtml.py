@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019-2021 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2023 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -160,6 +160,7 @@ def display_field_name(field):
 
 
 def separate_repository(row):
+    # pylint: disable=too-many-return-statements
     if row.restricted:
         return 'restricted'
     if 'multilib/nonfree' in row.repo:
@@ -170,6 +171,8 @@ def separate_repository(row):
         return 'multilib'
     if 'debug' in row.repo:
         return 'debug'
+    if 'bootstrap' in row.repo:
+        return 'bootstrap'
     return None
 
 

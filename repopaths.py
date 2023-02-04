@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2019-2020 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2019-2023 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -28,7 +28,7 @@ def directory_name(repo):
     result = ''
     if 'musl/' in repo:
         result += 'musl_'
-    for i in ('multilib', 'nonfree', 'debug'):
+    for i in ['multilib', 'nonfree', 'debug', 'bootstrap']:
         if i in repo:
             result += i + '_'
     result += repo.rpartition('/')[-1]

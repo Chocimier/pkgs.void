@@ -2,6 +2,10 @@ armv6l
 armv7l
 i686
 x86_64
+bootstrap/armv6l
+bootstrap/armv7l
+bootstrap/i686
+bootstrap/x86_64
 debug/armv6l
 debug/armv7l
 debug/i686
@@ -11,6 +15,9 @@ multilib/nonfree/x86_64
 musl/armv6l-musl
 musl/armv7l-musl
 musl/x86_64-musl
+musl/bootstrap/armv6l-musl
+musl/bootstrap/armv7l-musl
+musl/bootstrap/x86_64-musl
 musl/debug/armv6l-musl
 musl/debug/armv7l-musl
 musl/debug/x86_64-musl
@@ -27,6 +34,8 @@ nonfree/i686
 nonfree/x86_64
 aarch64/aarch64
 aarch64/aarch64-musl
+aarch64/bootstrap/aarch64
+aarch64/bootstrap/aarch64-musl
 aarch64/debug/aarch64
 aarch64/debug/aarch64-musl
 aarch64/nonfree/aarch64
