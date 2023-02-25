@@ -141,7 +141,7 @@ def _scrap_log(arch, number, datasource, desired_pkgver=None):
     already_found = False
     with urlopen(url) as response:
         datasource.delete(batchnumber=number)
-        for line in response.readlines():
+        for line in response:
             line = line.decode().strip()
             if _is_log_mark_line(line):
                 pkgver = _pkgver_of_mark_line(line)
