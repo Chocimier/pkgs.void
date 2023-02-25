@@ -46,6 +46,7 @@ logger = get_task_logger(__name__)
 def scrap_batches(arch, numbers):
     numbers = list(numbers)
     if not numbers:
+        logger.info('no batch numbers for %s', arch)
         return
     numbers_formatted = ', '.join(str(i) for i in numbers)
     logger.info('scraping %s batches number %s', arch, numbers_formatted)
@@ -126,6 +127,10 @@ def scrap_log(arch, number, desired_pkgver=None):
 @app.task()
 def scrap_log_chain_link(already_found, arch, number, desired_pkgver):
     if already_found:
+        logger.info(
+            'already found log for %s %s, skipping fetching %s',
+            desired_pkgver, arch, number
+        )
         return True
     return scrap_log(arch, number, desired_pkgver)
 
@@ -147,6 +152,7 @@ def _scrap_log(arch, number, datasource, desired_pkgver=None):
                     arch=arch,
                     batchnumber=number,
                     state=CONFIRMED)
+                logger.info('found %s in batch %s', package, number)
                 datasource.create(package)
                 if pkgver == desired_pkgver:
                     already_found = True
@@ -185,7 +191,9 @@ def get_log(pkgver, arch):
 @app.task()
 def find_log(pkgver, arch):
     datasource = factory()
+    logger.info('looking for log of %s %s', pkgver, arch)
     if known_log(pkgver, arch, datasource):
+        logger.info('already known log of %s %s', pkgver, arch)
         return
     pkgname = xbps.pkgname_from_pkgver(pkgver)
     packages = list(datasource.read(pkgname=pkgname, arch=arch, state=GUESS))
@@ -194,6 +202,7 @@ def find_log(pkgver, arch):
     def sig(package):
         return scrap_log_chain_link.s(arch, package.batchnumber, pkgver)
 
+    logger.info('chaining')
     chain(sig(package) for package in packages).delay(False)
 
 
@@ -211,7 +220,7 @@ def _scrap_max_batchnumbers(datasource):
     for builder_name, builder_data in data.items():
         arch = removesuffix(builder_name, BUILDER_NAME_SUFFIX)
         max_number = max(builder_data['cachedBuilds'], default=0)
-        logger.info('found %s for %s', max_number, arch)
+        logger.info('found batch %s for %s', max_number, arch)
         datasource.set_max_batch(arch, str(max_number))
 
 
@@ -226,10 +235,12 @@ def scrap_few_random():
     datasource = factory()
     arch_list = list(datasource.random_arch())
     if not arch_list:
+        logger.info('no archs to scrap from')
         return
     arch = arch_list[0]
     count = config.PERIODIC_SCRAP_COUNT
     numbers = list(datasource.unfetched_builds(arch, count))
+    logger.info('scrapping ahead batches %s for %s', numbers, count)
     scrap_batches.delay(arch, numbers)
 
 
