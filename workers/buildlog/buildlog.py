@@ -202,7 +202,7 @@ def find_log(pkgver, arch):
     def sig(package):
         return scrap_log_chain_link.s(arch, package.batchnumber, pkgver)
 
-    logger.info('chaining')
+    logger.info('chaining %s', packages)
     chain(sig(package) for package in packages).delay(False)
 
 
@@ -240,7 +240,7 @@ def scrap_few_random():
     arch = arch_list[0]
     count = config.PERIODIC_SCRAP_COUNT
     numbers = list(datasource.unfetched_builds(arch, count))
-    logger.info('scrapping ahead batches %s for %s', numbers, count)
+    logger.info('scrapping ahead batches %s for %s', numbers, arch)
     scrap_batches.delay(arch, numbers)
 
 
