@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2021 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2021-2023 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -15,6 +15,7 @@
 
 import json
 import math
+import re
 from urllib.request import urlopen
 
 from celery import Celery, chain
@@ -29,7 +30,9 @@ from workers.buildlog.datasource import (
 
 
 BATCH_MARK = 'Finished building packages: '
-PACKAGE_MARK_PREFIX = '=> '
+PACKAGE_MARK_REGEXP = re.compile(
+    '^(?:\x1b[^=]+)?=> (\\S+): running do-pkg hook: 00-gen-pkg [.]{3}$'
+)
 PACKAGE_MARK_SUFFIX = ': running do-pkg hook: 00-gen-pkg ...'
 BUILDER_NAME_SUFFIX = '_builder'
 COMMIT_UPDATE = ': update to '
@@ -143,8 +146,8 @@ def _scrap_log(arch, number, datasource, desired_pkgver=None):
         datasource.delete(batchnumber=number)
         for line in response:
             line = line.decode(errors='replace').strip()
-            if _is_log_mark_line(line):
-                pkgver = _pkgver_of_mark_line(line)
+            pkgver = _pkgver_of_mark_line(line)
+            if pkgver:
                 pkgname = xbps.pkgname_from_pkgver(pkgver)
                 package = Package(
                     pkgname=pkgname,
@@ -159,15 +162,14 @@ def _scrap_log(arch, number, datasource, desired_pkgver=None):
     return already_found
 
 
-def _is_log_mark_line(line):
-    return (
-        line.startswith(PACKAGE_MARK_PREFIX)
-        and line.endswith(PACKAGE_MARK_SUFFIX)
-    )
-
-
 def _pkgver_of_mark_line(line):
-    return line[len(PACKAGE_MARK_PREFIX):-len(PACKAGE_MARK_SUFFIX)]
+    if not line.endswith(PACKAGE_MARK_SUFFIX):
+        return None
+    match = PACKAGE_MARK_REGEXP.match(line)
+    if not match:
+        logger.warning('line almost matches build pattern: %s', line)
+        return None
+    return match.group(1)
 
 
 def _package_order_key(package, pkgver):
