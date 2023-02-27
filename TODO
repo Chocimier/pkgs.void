@@ -17,4 +17,3 @@ no link back from buildlog page
 tar-exclude assumes root dir name
 docker secret and upload over sharing volume
 rewrite shell scripts in python
-handel non-utf8 logs (https://build.voidlinux.org/builders/x86_64_builder/builds/31927/steps/shell_3/logs/stdio/text)

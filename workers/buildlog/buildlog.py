@@ -142,7 +142,7 @@ def _scrap_log(arch, number, datasource, desired_pkgver=None):
     with urlopen(url) as response:
         datasource.delete(batchnumber=number)
         for line in response:
-            line = line.decode().strip()
+            line = line.decode(errors='replace').strip()
             if _is_log_mark_line(line):
                 pkgver = _pkgver_of_mark_line(line)
                 pkgname = xbps.pkgname_from_pkgver(pkgver)
