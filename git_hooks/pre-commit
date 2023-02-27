@@ -3,7 +3,8 @@
 ret=0
 
 if git diff --staged --name-only | grep -q '[.]py$'; then
-	flake8 --exclude thirdparty,venv,venv-* || ret=1
+	python -m pytest || exit
+	flake8 --exclude thirdparty,venv,venv-*,tests || ret=1
 	pylint --rcfile .pylint --jobs 0 *.py tools workers || ret=1
 fi
 

@@ -1,3 +1,4 @@
 flake8>=6.0.0
 gprof2dot>=2022.7.29
 pylint>=2.16.2
+pytest>=7.2.1
