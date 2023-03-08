@@ -152,6 +152,11 @@ class Datasource(metaclass=abc.ABCMeta):
         '''Finds packages that match criteria passed as keyword arguments.'''
 
     @abc.abstractmethod
+    def exists(self, **kwargs):
+        '''Finds whether packages that match criteria
+        passed as keyword arguments exists.'''
+
+    @abc.abstractmethod
     def same_template(self, pkgname):
         '''Returns names of packages built from same template.'''
 
@@ -343,6 +348,16 @@ class SqliteDataSource(Datasource):
         )
         self._cursor.execute(query, [kwargs[i] for i in fixed])
         return (PackageRow.from_record(x) for x in self._cursor.fetchall())
+
+    def exists(self, **kwargs):
+        '''Finds whether packages that match criteria
+        passed as keyword arguments exists.'''
+        fixed = [i for i in kwargs if i in PackageRow._fields]
+        query = 'SELECT 1 FROM packages WHERE {} LIMIT 1'.format(
+            ' AND '.join(f'{i} = ?' for i in fixed)
+        )
+        self._cursor.execute(query, [kwargs[i] for i in fixed])
+        return bool(self._cursor.fetchall())
 
     def same_template(self, pkgname):
         '''Returns names of packages built from same template.'''

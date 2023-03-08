@@ -93,14 +93,16 @@ def build_db(source, repos):
         dictionary['pkgver'] = pkgver
         dictionary['source-revisions'] = dictionary['pkgname']
         template_json = datasource.to_json(dictionary)
-        if 'restricted' in dictionary:
-            if dictionary['restricted'] == 'yes':
-                dictionary['restricted'] = True
+        restricted = dictionary.get('restricted', False)
+        in_source = source.exists(pkgname=pkgname, pkgver=pkgver)
+        if 'restricted' in dictionary or not in_source:
+            if restricted == 'yes':
+                restricted = True
             source.create(datasource.PackageRow(
                 pkgname=pkgname,
                 pkgver=pkgver,
                 arch='unknown-unknown',
-                restricted=dictionary['restricted'],
+                restricted=restricted,
                 templatedata=template_json,
                 mainpkg=pkgname,
                 repo=''

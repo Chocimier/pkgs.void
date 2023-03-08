@@ -18,6 +18,7 @@
 # This script updates packages database and published source tarball.
 
 download=yes
+repodata=yes
 templates=yes
 updates=
 popularity=yes
@@ -34,6 +35,7 @@ do
         -B) builddate= ;;
         -D) download= ;;
         -P) popularity= ;;
+        -R) repodata= ;;
         -T) templates= ;;
         -t) templates=yes ;;
         -u) updates=yes ;;
@@ -111,7 +113,7 @@ fi
 cd .. || exit 1
 
 rm -f "$newindex"
-./builddb.py $repos
+[ "$repodata" ] && ./builddb.py $repos
 [ "$templates" ] && ./dbfromrepo.py $repos
 [ "$updates" ] && ./updates.py $repos
 [ "$popularity" ] && ./popularity.py

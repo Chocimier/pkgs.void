@@ -9,8 +9,6 @@ incremental update
 maybe:
 restricted for archs
 make it proper module (would need a way to publish source)
-build db without binary repository
-- package for arch without binary repo, or broken one, displays in search results, but has no page
 packages build together only on main package
 build logs only on main package
 no link back from buildlog page
