@@ -1,5 +1,5 @@
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2021-2023 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2021-2024 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -25,7 +25,7 @@ import xbps
 from settings import load_config
 from sink import removeprefix, removesuffix
 from workers.buildlog.datasource import (
-    ERROR, CONFIRMED, GUESS, Batch, Package, factory, update
+    ERROR, CONFIRMED, GUESS, REFUTED, Batch, Package, factory, update
 )
 
 
@@ -143,23 +143,29 @@ def _scrap_log(arch, number, datasource, desired_pkgver=None):
     logger.info('scrapping %s', url)
     already_found = False
     with urlopen(url) as response:
-        datasource.delete(batchnumber=number)
-        for line in response:
-            line = line.decode(errors='replace').strip()
-            pkgver = _pkgver_of_mark_line(line)
-            if pkgver:
-                pkgname = xbps.pkgname_from_pkgver(pkgver)
-                package = Package(
-                    pkgname=pkgname,
-                    pkgver=pkgver,
-                    arch=arch,
-                    batchnumber=number,
-                    state=CONFIRMED)
-                logger.info('found %s in batch %s', package, number)
-                datasource.create(package)
-                if pkgver == desired_pkgver:
-                    already_found = True
+        datasource.update(arch=arch, batchnumber=number, set_state=REFUTED)
+        for pkgver in parse_log_file(response):
+            pkgname = xbps.pkgname_from_pkgver(pkgver)
+            package = Package(
+                pkgname=pkgname,
+                pkgver=pkgver,
+                arch=arch,
+                batchnumber=number,
+                state=CONFIRMED)
+            logger.info('found %s in batch %s', package, number)
+            datasource.create(package)
+            if pkgver == desired_pkgver:
+                already_found = True
+
     return already_found
+
+
+def parse_log_file(response):
+    for line in response:
+        line = line.decode(errors='replace').strip()
+        pkgver = _pkgver_of_mark_line(line)
+        if pkgver:
+            yield pkgver
 
 
 def _pkgver_of_mark_line(line):
