@@ -36,3 +36,6 @@ class MetapackageInterest:
 
     def get(self, pkgname):
         return self._map.get(pkgname, Interest.NOVEL)
+
+    def __iter__(self):
+        return iter(self._map)

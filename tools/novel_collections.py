@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # pkgs.void - web catalog of Void Linux packages.
-# Copyright (C) 2020 Piotr Wójcik <chocimier@tlen.pl>
+# Copyright (C) 2020-2024 Piotr Wójcik <chocimier@tlen.pl>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU Affero General Public License as
@@ -21,9 +21,16 @@ sys.path.append('.')
 
 import datasource # noqa, pylint: disable=wrong-import-position
 from custom_types import Interest # noqa, pylint: disable=wrong-import-position
+from metadata import MetapackageInterest # noqa, pylint: disable=wrong-import-position
 
 SOURCE = datasource.factory()
-COLLECTIONS = SOURCE.metapackages()
+COLLECTIONS = list(SOURCE.metapackages())
 for i in COLLECTIONS:
     if Interest(i['classification']) == Interest.NOVEL:
         print(i['pkgname'])
+
+declared = set(MetapackageInterest())
+present = set(i['pkgname'] for i in COLLECTIONS)
+absent = declared - present
+for i in sorted(absent):
+    print('-', i)
