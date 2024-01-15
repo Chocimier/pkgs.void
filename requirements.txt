@@ -1,7 +1,7 @@
-celery[redis]>=5.2.7
-Flask>=2.2.3
+celery[redis]>=5.3.6
+Flask>=3.0.0
 flup>=1.0.3
-humanize>=4.6.0
-lxml>=4.9.2
+humanize>=4.9.0
+lxml>=5.1.0
 Tenjin>=1.1.1
-ujson>=5.7.0
+ujson>=5.9.0
