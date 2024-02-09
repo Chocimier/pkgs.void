@@ -5,3 +5,4 @@ pkgs.void/static/source
 .git
 __pycache__
 *.sqlite3
+celerybeat-schedule.db
